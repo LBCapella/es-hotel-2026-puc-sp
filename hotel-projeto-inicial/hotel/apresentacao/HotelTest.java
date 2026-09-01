@@ -18,6 +18,13 @@ public class HotelTest {
         testarCancelarReservaComSucesso();
         testarCancelarReservaInvalidaLancaExcecao();
 
+        // Ciclo 3 - Apartamento (Check-in & Check-out)
+        testarCheckinDiretoSemReserva();
+        testarCheckinApartamentoReservado();
+        testarCheckinApartamentoJaOcupadoLancaExcecao();
+        testarCheckoutComSucesso();
+        testarCheckoutApartamentoNaoOcupadoLancaExcecao();
+
         System.out.println(passou + "/" + total + " testes passaram");
         
         if (passou < total) {
@@ -104,7 +111,7 @@ public class HotelTest {
             Hospede h2 = new Hospede("98765432100", "Maria", "Rua B", "11888887777", "maria@email.com");
             
             apto.reservar(h1);
-            apto.reservar(h2); // Deve lançar IllegalStateException
+            apto.reservar(h2);
             
             System.out.println("FALHOU: testarReservarApartamentoNaoLivreLancaExcecao - Permitiu reservar apartamento que já estava reservado");
         } catch (IllegalStateException e) {
@@ -136,14 +143,104 @@ public class HotelTest {
     static void testarCancelarReservaInvalidaLancaExcecao() {
         total++;
         try {
-            Apartamento apto = new Apartamento(); // Inicialmente LIVRE
-            apto.cancelarReserva(); // Deve lançar IllegalStateException
+            Apartamento apto = new Apartamento();
+            apto.cancelarReserva();
             
             System.out.println("FALHOU: testarCancelarReservaInvalidaLancaExcecao - Permitiu cancelar reserva em apartamento LIVRE");
         } catch (IllegalStateException e) {
             passou++;
         } catch (Exception e) {
             System.out.println("FALHOU: testarCancelarReservaInvalidaLancaExcecao - Lançou exceção incorreta: " + e.getClass().getName());
+        }
+    }
+
+    // --- CICLO 3 ---
+
+    static void testarCheckinDiretoSemReserva() {
+        total++;
+        try {
+            Apartamento apto = new Apartamento();
+            Hospede h = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+            
+            apto.checkin(h);
+            
+            if (apto.estaOcupado() && h.equals(apto.getHospede()) && apto.getSymbol() == 'O') {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarCheckinDiretoSemReserva - Estado/símbolo/hóspede incorretos após check-in direto");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCheckinDiretoSemReserva - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarCheckinApartamentoReservado() {
+        total++;
+        try {
+            Apartamento apto = new Apartamento();
+            Hospede h = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+            
+            apto.reservar(h);
+            apto.checkin(h);
+            
+            if (apto.estaOcupado() && h.equals(apto.getHospede()) && apto.getSymbol() == 'O') {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarCheckinApartamentoReservado - Estado incorreto ao realizar check-in de apartamento reservado");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCheckinApartamentoReservado - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarCheckinApartamentoJaOcupadoLancaExcecao() {
+        total++;
+        try {
+            Apartamento apto = new Apartamento();
+            Hospede h1 = new Hospede("12345678900", "João", "Rua A", "11999998888", "joao@email.com");
+            Hospede h2 = new Hospede("98765432100", "Maria", "Rua B", "11888887777", "maria@email.com");
+            
+            apto.checkin(h1);
+            apto.checkin(h2);
+            
+            System.out.println("FALHOU: testarCheckinApartamentoJaOcupadoLancaExcecao - Permitiu check-in em apartamento já ocupado");
+        } catch (IllegalStateException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCheckinApartamentoJaOcupadoLancaExcecao - Lançou exceção incorreta: " + e.getClass().getName());
+        }
+    }
+
+    static void testarCheckoutComSucesso() {
+        total++;
+        try {
+            Apartamento apto = new Apartamento();
+            Hospede h = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+            
+            apto.checkin(h);
+            apto.checkout();
+            
+            if (apto.estaLivre() && apto.getHospede() == null && apto.getSymbol() == '.') {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarCheckoutComSucesso - Estado/hóspede não resetados após check-out");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCheckoutComSucesso - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarCheckoutApartamentoNaoOcupadoLancaExcecao() {
+        total++;
+        try {
+            Apartamento apto = new Apartamento(); // LIVRE
+            apto.checkout();
+            
+            System.out.println("FALHOU: testarCheckoutApartamentoNaoOcupadoLancaExcecao - Permitiu check-out em apartamento LIVRE");
+        } catch (IllegalStateException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCheckoutApartamentoNaoOcupadoLancaExcecao - Lançou exceção incorreta: " + e.getClass().getName());
         }
     }
 }
