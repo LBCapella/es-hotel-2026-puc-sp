@@ -7,9 +7,16 @@ public class HotelTest {
     private static int total = 0;
 
     public static void main(String[] args) {
+        // Ciclo 1 - Hospede
         testarCriacaoHospedeValido();
         testarHospedeParametroNuloLancaExcecao();
         testarHospedeEqualsEHashCodePorCpf();
+
+        // Ciclo 2 - Apartamento (Reserva & Cancelamento)
+        testarReservarApartamentoLivre();
+        testarReservarApartamentoNaoLivreLancaExcecao();
+        testarCancelarReservaComSucesso();
+        testarCancelarReservaInvalidaLancaExcecao();
 
         System.out.println(passou + "/" + total + " testes passaram");
         
@@ -66,6 +73,77 @@ public class HotelTest {
             }
         } catch (Exception e) {
             System.out.println("FALHOU: testarHospedeEqualsEHashCodePorCpf - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    // --- CICLO 2 ---
+
+    static void testarReservarApartamentoLivre() {
+        total++;
+        try {
+            Apartamento apto = new Apartamento();
+            Hospede h = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+            
+            apto.reservar(h);
+            
+            if (apto.estaReservado() && h.equals(apto.getHospede()) && apto.getSymbol() == 'R') {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarReservarApartamentoLivre - Estado/símbolo/hóspede incorretos após reserva");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarReservarApartamentoLivre - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarReservarApartamentoNaoLivreLancaExcecao() {
+        total++;
+        try {
+            Apartamento apto = new Apartamento();
+            Hospede h1 = new Hospede("12345678900", "João", "Rua A", "11999998888", "joao@email.com");
+            Hospede h2 = new Hospede("98765432100", "Maria", "Rua B", "11888887777", "maria@email.com");
+            
+            apto.reservar(h1);
+            apto.reservar(h2); // Deve lançar IllegalStateException
+            
+            System.out.println("FALHOU: testarReservarApartamentoNaoLivreLancaExcecao - Permitiu reservar apartamento que já estava reservado");
+        } catch (IllegalStateException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarReservarApartamentoNaoLivreLancaExcecao - Lançou exceção incorreta: " + e.getClass().getName());
+        }
+    }
+
+    static void testarCancelarReservaComSucesso() {
+        total++;
+        try {
+            Apartamento apto = new Apartamento();
+            Hospede h = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+            
+            apto.reservar(h);
+            apto.cancelarReserva();
+            
+            if (apto.estaLivre() && apto.getHospede() == null && apto.getSymbol() == '.') {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarCancelarReservaComSucesso - Estado/hóspede não resetados após cancelamento");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCancelarReservaComSucesso - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarCancelarReservaInvalidaLancaExcecao() {
+        total++;
+        try {
+            Apartamento apto = new Apartamento(); // Inicialmente LIVRE
+            apto.cancelarReserva(); // Deve lançar IllegalStateException
+            
+            System.out.println("FALHOU: testarCancelarReservaInvalidaLancaExcecao - Permitiu cancelar reserva em apartamento LIVRE");
+        } catch (IllegalStateException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCancelarReservaInvalidaLancaExcecao - Lançou exceção incorreta: " + e.getClass().getName());
         }
     }
 }
