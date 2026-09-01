@@ -59,12 +59,42 @@ public class Apartamento implements Serializable {
         this.hospede = h;
     }
 
+    /**
+     * Realiza o check-in de um hóspede no apartamento.
+     * Aceita transição a partir dos status LIVRE ou RESERVADO.
+     *
+     * @param h Dados do hóspede que fará o check-in
+     * @throws IllegalArgumentException se o hóspede for nulo
+     * @throws IllegalStateException se o apartamento já estiver no status OCUPADO
+     *
+     * @pre O apartamento deve estar com status LIVRE ou RESERVADO e o hóspede não pode ser nulo
+     * @post O apartamento transiciona para OCUPADO e o hóspede é armazenado
+     */
     public void checkin(Hospede h) {
-        throw new UnsupportedOperationException("Implementar: LIVRE/RESERVADO -> OCUPADO");
+        if (h == null) {
+            throw new IllegalArgumentException("Hóspede não pode ser nulo para check-in.");
+        }
+        if (status == Status.OCUPADO) {
+            throw new IllegalStateException("Apartamento já está ocupado.");
+        }
+        this.status = Status.OCUPADO;
+        this.hospede = h;
     }
 
+    /**
+     * Realiza o check-out do apartamento, liberando a unidade.
+     *
+     * @throws IllegalStateException se o apartamento não estiver no status OCUPADO
+     *
+     * @pre O apartamento deve estar com status OCUPADO
+     * @post O apartamento transiciona para LIVRE e o hóspede torna-se null
+     */
     public void checkout() {
-        throw new UnsupportedOperationException("Implementar: OCUPADO -> LIVRE");
+        if (status != Status.OCUPADO) {
+            throw new IllegalStateException("Apenas apartamentos ocupados podem realizar check-out.");
+        }
+        this.status = Status.LIVRE;
+        this.hospede = null;
     }
 
     /**
