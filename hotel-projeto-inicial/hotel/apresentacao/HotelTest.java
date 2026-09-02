@@ -1,6 +1,7 @@
 package hotel.apresentacao;
 
 import hotel.modelo.*;
+import hotel.negocio.Hotel;
 
 public class HotelTest {
     private static int passou = 0;
@@ -24,6 +25,11 @@ public class HotelTest {
         testarCheckinApartamentoJaOcupadoLancaExcecao();
         testarCheckoutComSucesso();
         testarCheckoutApartamentoNaoOcupadoLancaExcecao();
+
+        // Ciclo 4 - Fachada Hotel & Coordenadas
+        testarInicializacaoHotelMatrizLivre();
+        testarCoordenadasInvalidasLancaExcecao();
+        testarOperacoesFachadaHotelDelegacao();
 
         System.out.println(passou + "/" + total + " testes passaram");
         
@@ -233,7 +239,7 @@ public class HotelTest {
     static void testarCheckoutApartamentoNaoOcupadoLancaExcecao() {
         total++;
         try {
-            Apartamento apto = new Apartamento(); // LIVRE
+            Apartamento apto = new Apartamento();
             apto.checkout();
             
             System.out.println("FALHOU: testarCheckoutApartamentoNaoOcupadoLancaExcecao - Permitiu check-out em apartamento LIVRE");
@@ -241,6 +247,83 @@ public class HotelTest {
             passou++;
         } catch (Exception e) {
             System.out.println("FALHOU: testarCheckoutApartamentoNaoOcupadoLancaExcecao - Lançou exceção incorreta: " + e.getClass().getName());
+        }
+    }
+
+    // --- CICLO 4 ---
+
+    static void testarInicializacaoHotelMatrizLivre() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            boolean todosLivres = true;
+
+            for (int a = 0; a < Hotel.NUM_ANDARES; a++) {
+                for (int n = 0; n < Hotel.APTOS_POR_ANDAR; n++) {
+                    Apartamento apto = hotel.getApartamento(a, n);
+                    if (apto == null || !apto.estaLivre()) {
+                        todosLivres = false;
+                        break;
+                    }
+                }
+            }
+
+            if (todosLivres) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarInicializacaoHotelMatrizLivre - Nem todos os apartamentos iniciaram como LIVRE");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarInicializacaoHotelMatrizLivre - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarCoordenadasInvalidasLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede h = new Hospede("12345678900", "João", "Rua A", "11999998888", "joao@email.com");
+
+            boolean capturouExcecoes = true;
+
+            try { hotel.getApartamento(-1, 0); capturouExcecoes = false; } catch (IllegalArgumentException e) {}
+            try { hotel.reservarApartamento(20, 0, h); capturouExcecoes = false; } catch (IllegalArgumentException e) {}
+            try { hotel.realizarCheckin(0, -1, h); capturouExcecoes = false; } catch (IllegalArgumentException e) {}
+            try { hotel.realizarCheckout(0, 14); capturouExcecoes = false; } catch (IllegalArgumentException e) {}
+            try { hotel.cancelarReserva(25, 30); capturouExcecoes = false; } catch (IllegalArgumentException e) {}
+
+            if (capturouExcecoes) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarCoordenadasInvalidasLancaExcecao - Alguma coordenada inválida não lançou IllegalArgumentException");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCoordenadasInvalidasLancaExcecao - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarOperacoesFachadaHotelDelegacao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede h = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+
+            boolean res1 = hotel.reservarApartamento(0, 0, h);
+            boolean estadoReservado = hotel.getApartamento(0, 0).estaReservado();
+
+            boolean res2 = hotel.realizarCheckin(0, 0, h);
+            boolean estadoOcupado = hotel.getApartamento(0, 0).estaOcupado();
+
+            boolean res3 = hotel.realizarCheckout(0, 0);
+            boolean estadoLivre = hotel.getApartamento(0, 0).estaLivre();
+
+            if (res1 && estadoReservado && res2 && estadoOcupado && res3 && estadoLivre) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarOperacoesFachadaHotelDelegacao - Retornos ou delegação da fachada Hotel inconsistentes");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarOperacoesFachadaHotelDelegacao - Lançou exceção inesperada: " + e.getMessage());
         }
     }
 }
