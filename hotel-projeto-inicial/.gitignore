@@ -1,3 +1,6 @@
 *.class
 build/
+doc/
 hotel.dat
+claude.md
+plano-core.md
