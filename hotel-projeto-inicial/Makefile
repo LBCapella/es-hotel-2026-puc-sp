@@ -6,12 +6,12 @@ compile:
 	javac -d build hotel/modelo/*.java hotel/negocio/*.java hotel/repositorio/*.java hotel/servico/*.java hotel/apresentacao/*.java
 
 #- Executa o sistema
-run:
-	java -cp build hotel.Main
+run: compile
+	java -cp build hotel.apresentacao.Main
 
 #- Executa os testes
-test:
-	java -cp build hotel.HotelTest
+test: compile
+	java -cp build hotel.apresentacao.HotelTest
 
 #- Limpa artefatos de compilacao
 clean:

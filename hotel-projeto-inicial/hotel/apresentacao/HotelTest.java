@@ -31,6 +31,14 @@ public class HotelTest {
         testarCoordenadasInvalidasLancaExcecao();
         testarOperacoesFachadaHotelDelegacao();
 
+        // Ciclo 5 - Hierarquia de Apartamentos & Integração
+        testarApartamentoBasePrecoDiaria();
+        testarApartamentoSimplesPrecoDiaria();
+        testarApartamentoPremiumPrecoDiaria();
+        testarHotelInicializaSimplesEPremiumPorAndar();
+        testarSubclassesHerdamTransicoesDeEstado();
+        testarSubclassesHerdamValidacaoDeEstado();
+
         System.out.println(passou + "/" + total + " testes passaram");
         
         if (passou < total) {
@@ -324,6 +332,143 @@ public class HotelTest {
             }
         } catch (Exception e) {
             System.out.println("FALHOU: testarOperacoesFachadaHotelDelegacao - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarApartamentoBasePrecoDiaria() {
+        total++;
+        try {
+            Apartamento apto = new Apartamento();
+
+            if (apto.getPrecoDiaria() == 0f) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarApartamentoBasePrecoDiaria - Esperado: 0.0, obtido: " + apto.getPrecoDiaria());
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarApartamentoBasePrecoDiaria - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarApartamentoSimplesPrecoDiaria() {
+        total++;
+        try {
+            Apartamento apto = new ApartamentoSimples();
+
+            if (apto.getPrecoDiaria() == 150.0f) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarApartamentoSimplesPrecoDiaria - Esperado: 150.0, obtido: " + apto.getPrecoDiaria());
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarApartamentoSimplesPrecoDiaria - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarApartamentoPremiumPrecoDiaria() {
+        total++;
+        try {
+            Apartamento apto = new ApartamentoPremium();
+
+            if (apto.getPrecoDiaria() == 350.0f) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarApartamentoPremiumPrecoDiaria - Esperado: 350.0, obtido: " + apto.getPrecoDiaria());
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarApartamentoPremiumPrecoDiaria - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarHotelInicializaSimplesEPremiumPorAndar() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            int simples = 0;
+            int premium = 0;
+            boolean aptoCorreto = true;
+
+            for (int a = 0; a < Hotel.NUM_ANDARES; a++){
+                for(int n = 0; n < Hotel.APTOS_POR_ANDAR; n++){
+                    Apartamento apto = hotel.getApartamento(a, n);
+                    if(apto instanceof ApartamentoSimples){
+                        simples++;
+                        if(n >= 8) aptoCorreto = false; // verificando se está entre os aptos simples
+                    } else if (apto instanceof ApartamentoPremium){
+                        premium++;
+                        if(n < 8) aptoCorreto = false;
+                    }
+                }
+            }
+            if(simples == 160 && premium == 120 && aptoCorreto){
+                passou++;
+            }else {
+                System.out.println("FALHOU: testarHotelInicializaSimplesEPremiumPorAndar - Simples: "
+                + simples 
+                +", Premium: " + premium
+                +", aptoCorreto: "+ aptoCorreto);
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarHotelInicializaSimplesEPremiumPorAndar - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarSubclassesHerdamTransicoesDeEstado() {
+        total++;
+        try {
+            Apartamento[] tipos = { new ApartamentoSimples(), new ApartamentoPremium() };
+            Hospede h = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+            boolean estadoCorreto = true;
+
+            for ( Apartamento apto : tipos) {
+                apto.reservar(h);
+                if (!apto.estaReservado()){
+                    estadoCorreto = false;
+                    break;
+                }
+                apto.checkin(h);
+                if (!apto.estaOcupado()){
+                    estadoCorreto = false;
+                    break;
+                }
+                apto.checkout();
+                if (!apto.estaLivre()){
+                    estadoCorreto = false;
+                    break;
+                }
+            }
+            if (estadoCorreto) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarSubclassesHerdamTransicoesDeEstado - Alguma subclasse não manteve transições de estado corretas");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarSubclassesHerdamTransicoesDeEstado - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarSubclassesHerdamValidacaoDeEstado() {
+        total++;
+        try {
+            Apartamento[] tipos = { new ApartamentoSimples(), new ApartamentoPremium() };
+            boolean validacaoCorreta = true;
+
+            for ( Apartamento apto : tipos) {
+                try {
+                    apto.checkout();
+                    validacaoCorreta = false;
+                    break;
+                } catch (IllegalStateException e) {
+                    // Esperado
+                }
+            }
+            if(validacaoCorreta) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarSubclassesHerdamValidacaoDeEstado - Alguma subclasse não manteve validação de estado correta");
+            }            
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarSubclassesHerdamValidacaoDeEstado - Lançou exceção incorreta: " + e.getClass().getName());
         }
     }
 }
