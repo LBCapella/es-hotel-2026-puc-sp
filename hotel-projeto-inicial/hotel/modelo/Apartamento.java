@@ -164,4 +164,9 @@ public class Apartamento implements Serializable {
             default: return '?';
         }
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + " [" + status + "] diária R$ " + getPrecoDiaria();
+    }
 }
