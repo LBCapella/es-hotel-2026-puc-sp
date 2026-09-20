@@ -44,6 +44,12 @@ public class HotelTest {
         testarToStringApartamentoPremiumOcupado();
         testarToStringAcompanhaMudancaDeEstado();
 
+        // Ciclo 7 - Apartamento taxas
+        testarTaxaHotelVazio(); // devem ser 0.0
+        testarTaxaOcupacaoProporcionalAosOcupados();
+        testarTaxaReservasProporcionalAosReservados();
+        testarTaxasNaoConfundemReservadoOcupado();
+
         System.out.println(passou + "/" + total + " testes passaram");
         
         if (passou < total) {
@@ -540,5 +546,102 @@ public class HotelTest {
         } catch (Exception e) {
             System.out.println("FALHOU: testarToStringAcompanhaMudancaDeEstado - Lançou exceção inesperada: " + e.getMessage());
         }
+    }
+
+    static void testarTaxaHotelVazio() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            float taxaOcupado = hotel.calcularTaxaOcupacao();
+            float taxaReservado = hotel.calcularTaxaReservas();
+
+            if ( taxaOcupado == 0.0f && taxaReservado == 0.0f){
+              passou++;
+            } else {
+              System.out.println("FALHOU: testarTaxaHotelVazio - taxaOcupado devolveu: "+ taxaOcupado + ", taxaReservado devolveu: "+ taxaReservado);
+            }
+        } catch (Exception e){
+            System.out.println("FALHOU: testarTaxaHotelVazio - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarTaxaOcupacaoProporcionalAosOcupados() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede h = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.realizarCheckin(2, 3, h);
+
+            float umOcupado = hotel.calcularTaxaOcupacao();
+
+            for (int n = 0; n < 14; n++) {
+                hotel.realizarCheckin(0, n, h);
+            }
+            float quinzeOcupados = hotel.calcularTaxaOcupacao();
+
+            if (aproximadamente(umOcupado, 1f / 280) && aproximadamente(quinzeOcupados, 15f / 280)) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarTaxaOcupacaoProporcionalAosOcupados - 1 ocupado: " + umOcupado
+                        + " (esperado " + 1f / 280 + "), 15 ocupados: " + quinzeOcupados + " (esperado " + 15f / 280 + ")");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarTaxaOcupacaoProporcionalAosOcupados - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarTaxaReservasProporcionalAosReservados() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede h = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+
+            hotel.reservarApartamento(2, 3, h);
+            float umReservado = hotel.calcularTaxaReservas();
+
+            for (int n = 0; n < 14; n++) {
+                hotel.reservarApartamento(0, n, h);
+            }
+            float quinzeReservados = hotel.calcularTaxaReservas();
+            float taxaOcupacao = hotel.calcularTaxaOcupacao();
+
+            if (aproximadamente(umReservado, 1f / 280) && aproximadamente(quinzeReservados, 15f / 280)
+                    && aproximadamente(taxaOcupacao, 0f)) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarTaxaReservasProporcionalAosReservados - 1 reservado: " + umReservado
+                        + " (esperado " + 1f / 280 + "), 15 reservados: " + quinzeReservados + " (esperado " + 15f / 280
+                        + "), taxa de ocupação: " + taxaOcupacao + " (esperado 0.0)");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarTaxaReservasProporcionalAosReservados - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarTaxasNaoConfundemReservadoOcupado() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede h = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+
+            hotel.reservarApartamento(0, 0, h);
+            hotel.realizarCheckin(0, 1, h);
+
+            float taxaReservas = hotel.calcularTaxaReservas();
+            float taxaOcupacao = hotel.calcularTaxaOcupacao();
+
+            if (aproximadamente(taxaReservas, 1f / 280) && aproximadamente(taxaOcupacao, 1f / 280)) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarTaxasNaoConfundemReservadoOcupado - taxa de reservas: " + taxaReservas
+                        + ", taxa de ocupação: " + taxaOcupacao + " (esperado " + 1f / 280 + " para ambas)");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarTaxasNaoConfundemReservadoOcupado - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static boolean aproximadamente(float a, float b) {
+        return Math.abs(a - b) < 0.000001f;
     }
 }
