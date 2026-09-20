@@ -39,6 +39,11 @@ public class HotelTest {
         testarSubclassesHerdamTransicoesDeEstado();
         testarSubclassesHerdamValidacaoDeEstado();
 
+        // Ciclo 6 - Apartamento.toString()
+        testarToStringApartamentoSimplesOcupado();
+        testarToStringApartamentoPremiumOcupado();
+        testarToStringAcompanhaMudancaDeEstado();
+
         System.out.println(passou + "/" + total + " testes passaram");
         
         if (passou < total) {
@@ -469,6 +474,71 @@ public class HotelTest {
             }            
         } catch (Exception e) {
             System.out.println("FALHOU: testarSubclassesHerdamValidacaoDeEstado - Lançou exceção incorreta: " + e.getClass().getName());
+        }
+    }
+
+    static void testarToStringApartamentoSimplesOcupado(){
+        total++;
+        try {
+            Apartamento apto = new ApartamentoSimples();
+            Hospede h = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            apto.checkin(h);
+
+            String texto = apto.toString();
+
+            if (texto.contains("ApartamentoSimples") && texto.contains("OCUPADO") && texto.contains("150.0")){
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarToStringApartamentoSimplesOcupado - toString devolveu: " + texto);
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarToStringApartamentoSimplesOcupado - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarToStringApartamentoPremiumOcupado(){
+        total++;
+        try {
+            Apartamento apto = new ApartamentoPremium();
+            Hospede h = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            apto.checkin(h);
+
+            String texto = apto.toString();
+
+            if (texto.contains("ApartamentoPremium") && texto.contains("OCUPADO") && texto.contains("350.0")){
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarToStringApartamentoPremiumOcupado - toString devolveu: " + texto);
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarToStringApartamentoPremiumOcupado - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarToStringAcompanhaMudancaDeEstado(){
+        total++;
+        try {
+            Apartamento apto = new ApartamentoSimples();
+            Hospede h = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            
+            apto.reservar(h);
+            String textoReservado = apto.toString();
+
+            apto.cancelarReserva();
+            String textoLivre = apto.toString();
+
+            boolean reservadoCorreto = textoReservado.contains("RESERVADO") && !textoReservado.contains("LIVRE"); // Verificando caso bom e triste
+            boolean canceladoCorreto = textoLivre.contains("LIVRE") && !textoLivre.contains("RESERVADO");
+
+            if (reservadoCorreto && canceladoCorreto) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarToStringAcompanhaMudancaDeEstado - toString reservado devolveu: " 
+                + textoReservado 
+                +", toString cancelado devolveu: "+ textoLivre);
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarToStringAcompanhaMudancaDeEstado - Lançou exceção inesperada: " + e.getMessage());
         }
     }
 }
