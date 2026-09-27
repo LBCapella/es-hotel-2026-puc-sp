@@ -128,6 +128,13 @@ public class Hotel implements Serializable {
         return true;
     }
 
+    /**
+     * Imprime no console o mapa de ocupação do hotel, uma linha por andar, com o símbolo
+     * de cada apartamento (. = LIVRE, R = RESERVADO, O = OCUPADO).
+     *
+     * @pre O hotel deve estar inicializado (construtor já o faz)
+     * @post Nenhuma alteração de estado; apenas exibição
+     */
     public void mostrarMapa() {
         for (int a = 0; a < NUM_ANDARES; a++) {
             StringBuilder linha = new StringBuilder();
@@ -158,10 +165,24 @@ public class Hotel implements Serializable {
         return count;
     }
 
+    /**
+     * Calcula a proporção de apartamentos com status OCUPADO em relação ao total do hotel.
+     *
+     * @return float entre 0.0 e 1.0 com a taxa de ocupação
+     * @pre O hotel deve estar inicializado (construtor já o faz)
+     * @post Nenhuma alteração de estado
+     */
     public float calcularTaxaOcupacao() {
         return (float) contar(Status.OCUPADO) / (NUM_ANDARES * APTOS_POR_ANDAR);
     }
 
+    /**
+     * Calcula a proporção de apartamentos com status RESERVADO em relação ao total do hotel.
+     *
+     * @return float entre 0.0 e 1.0 com a taxa de reservas
+     * @pre O hotel deve estar inicializado (construtor já o faz)
+     * @post Nenhuma alteração de estado
+     */
     public float calcularTaxaReservas() {
         return (float) contar(Status.RESERVADO) / (NUM_ANDARES * APTOS_POR_ANDAR);
     }
@@ -209,6 +230,21 @@ public class Hotel implements Serializable {
         return matriz[andar][numero];
     }
 
+    /**
+     * Obtém a lista de serviços cadastrados no cardápio do hotel.
+     *
+     * @return ArrayList com os serviços cadastrados (vazia se nenhum foi cadastrado)
+     * @pre Nenhuma
+     * @post Nenhuma alteração de estado
+     */
     public ArrayList<Servico> getServicos() { return servicos; }
+
+    /**
+     * Obtém a lista de todos os consumos de serviço registrados no hotel.
+     *
+     * @return ArrayList com os consumos registrados (vazia se nenhum foi registrado)
+     * @pre Nenhuma
+     * @post Nenhuma alteração de estado
+     */
     public ArrayList<Consumo> getConsumos() { return consumos; }
 }

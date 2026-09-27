@@ -165,6 +165,14 @@ public class Apartamento implements Serializable {
         }
     }
 
+    /**
+     * Retorna uma representação textual do apartamento, com o tipo concreto, o status
+     * atual e o valor da diária.
+     *
+     * @return String no formato "Tipo [STATUS] diária R$ valor"
+     * @pre Nenhuma
+     * @post Nenhuma alteração de estado
+     */
     @Override
     public String toString() {
         return getClass().getSimpleName() + " [" + status + "] diária R$ " + getPrecoDiaria();
