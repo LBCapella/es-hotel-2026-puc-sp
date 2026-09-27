@@ -139,12 +139,24 @@ public class Hotel implements Serializable {
         throw new UnsupportedOperationException("Implementar consultarApartamento");
     }
 
+    private int contar(Status status) {
+        int count = 0;
+        for (int a = 0; a < NUM_ANDARES; a++) {
+            for (int n = 0; n < APTOS_POR_ANDAR; n++) {
+                if (matriz[a][n].getStatus() == status) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
     public float calcularTaxaOcupacao() {
-        throw new UnsupportedOperationException("Implementar calcularTaxaOcupacao");
+        return (float) contar(Status.OCUPADO) / (NUM_ANDARES * APTOS_POR_ANDAR);
     }
 
     public float calcularTaxaReservas() {
-        throw new UnsupportedOperationException("Implementar calcularTaxaReservas");
+        return (float) contar(Status.RESERVADO) / (NUM_ANDARES * APTOS_POR_ANDAR);
     }
 
     public void cadastrarServico(String nome, float preco) {
