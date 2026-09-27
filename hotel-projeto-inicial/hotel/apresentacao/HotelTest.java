@@ -2,6 +2,9 @@ package hotel.apresentacao;
 
 import hotel.modelo.*;
 import hotel.negocio.Hotel;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 
 public class HotelTest {
     private static int passou = 0;
@@ -49,6 +52,11 @@ public class HotelTest {
         testarTaxaOcupacaoProporcionalAosOcupados();
         testarTaxaReservasProporcionalAosReservados();
         testarTaxasNaoConfundemReservadoOcupado();
+
+        // Ciclo 8 - mostrarMapa()
+        testarMostrarMapaHotelVazio();
+        testarMostrarMapaRefleteReservaECheckin();
+        testarMostrarMapaNaoAlteraEstado();
 
         System.out.println(passou + "/" + total + " testes passaram");
         
@@ -643,5 +651,90 @@ public class HotelTest {
 
     static boolean aproximadamente(float a, float b) {
         return Math.abs(a - b) < 0.000001f;
+    }
+
+    // --- CICLO 8 ---
+
+    /**
+     * Executa acao capturando tudo que for impresso em System.out, restaurando
+     * o System.out original ao final (mesmo se acao lançar exceção).
+     */
+    static String capturarSaida(Runnable acao) {
+        PrintStream original = System.out;
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        try {
+            System.setOut(new PrintStream(buffer, true, StandardCharsets.UTF_8));
+            acao.run();
+        } finally {
+            System.setOut(original);
+        }
+        return buffer.toString(StandardCharsets.UTF_8);
+    }
+
+    static void testarMostrarMapaHotelVazio() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+
+            String saida = capturarSaida(() -> hotel.mostrarMapa());
+            String[] linhas = saida.split("\n");
+            long pontos = saida.chars().filter(c -> c == '.').count();
+
+            if (linhas.length == 20 && pontos == 280) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarMostrarMapaHotelVazio - linhas: " + linhas.length
+                        + " (esperado 20), pontos: " + pontos + " (esperado 280)");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarMostrarMapaHotelVazio - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarMostrarMapaRefleteReservaECheckin() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede h = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+
+            hotel.reservarApartamento(0, 0, h);
+            hotel.realizarCheckin(1, 1, h);
+
+            String saida = capturarSaida(() -> hotel.mostrarMapa());
+            long reservados = saida.chars().filter(c -> c == 'R').count();
+            long ocupados = saida.chars().filter(c -> c == 'O').count();
+
+            if (reservados == 1 && ocupados == 1) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarMostrarMapaRefleteReservaECheckin - R: " + reservados
+                        + " (esperado 1), O: " + ocupados + " (esperado 1)");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarMostrarMapaRefleteReservaECheckin - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarMostrarMapaNaoAlteraEstado() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede h = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.realizarCheckin(5, 5, h);
+
+            capturarSaida(() -> hotel.mostrarMapa());
+            boolean aindaOcupadoAntes = hotel.getApartamento(5, 5).estaOcupado();
+
+            capturarSaida(() -> hotel.mostrarMapa());
+            boolean aindaOcupadoDepois = hotel.getApartamento(5, 5).estaOcupado();
+
+            if (aindaOcupadoAntes && aindaOcupadoDepois) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarMostrarMapaNaoAlteraEstado - estado do apartamento mudou apos mostrarMapa");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarMostrarMapaNaoAlteraEstado - Lançou exceção inesperada: " + e.getMessage());
+        }
     }
 }
