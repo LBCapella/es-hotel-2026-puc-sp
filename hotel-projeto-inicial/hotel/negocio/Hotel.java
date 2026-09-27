@@ -129,7 +129,14 @@ public class Hotel implements Serializable {
     }
 
     public void mostrarMapa() {
-        throw new UnsupportedOperationException("Implementar mostrarMapa");
+        for (int a = 0; a < NUM_ANDARES; a++) {
+            StringBuilder linha = new StringBuilder();
+            linha.append("Andar ").append(String.format("%02d", a)).append(": ");
+            for (int n = 0; n < APTOS_POR_ANDAR; n++) {
+                linha.append(matriz[a][n].getSymbol()).append(" ");
+            }
+            System.out.println(linha.toString().trim());
+        }
     }
 
     public void consultarApartamento(int andar, int numero) {
