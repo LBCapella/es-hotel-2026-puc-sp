@@ -17,6 +17,8 @@ public class HotelTest {
         testarHospedeEqualsEHashCodePorCpf();
 
         // Ciclo 2 - Apartamento (Reserva & Cancelamento)
+        testarReservaPodeTerVariosHospedes();
+
         testarReservarApartamentoLivre();
         testarReservarApartamentoNaoLivreLancaExcecao();
         testarCancelarReservaComSucesso();
@@ -117,6 +119,26 @@ public class HotelTest {
     }
 
     // --- CICLO 2 ---
+
+    static void testarReservaPodeTerVariosHospedes() {
+        total++;
+        try {
+            Hospede h1 = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+            Hospede h2 = new Hospede("98765432100", "Maria Souza", "Rua B", "11888887777", "maria@email.com");
+            
+            Reserva reserva = new Reserva(1, h1);
+
+            reserva.adicionarHospede(h2);
+
+            if (reserva.getTitular().equals(h1) && reserva.getHospedes().size() == 2 && reserva.getHospedes().contains(h1) && reserva.getHospedes().contains(h2)) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarReservaPodeTerVariosHospedes - Reserva não possui os hóspedes esperados");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarReservaPodeTerVariosHospedes - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
 
     static void testarReservarApartamentoLivre() {
         total++;
