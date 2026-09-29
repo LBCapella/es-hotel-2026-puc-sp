@@ -457,6 +457,31 @@ public class HotelTest {
         }
     }
 
+    static void testarHotelReservaComReserva() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+
+            Reserva reserva = new Reserva(1, titular);
+            hotel.reservarApartamento(0, 0, reserva);
+
+            Apartamento apto = hotel.getApartamento(0, 0);
+
+            if (apto.estaReservado() && reserva.equals(apto.getReserva())) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarHotelReservaComReserva - " + "Apartamento não foi reservado com a Reserva");
+            }
+
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarHotelReservaComReserva - " + "Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    // --- CICLO 5 ---
+
     static void testarApartamentoBasePrecoDiaria() {
         total++;
         try {
