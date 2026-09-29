@@ -17,6 +17,13 @@ public class Reserva {
     }
 
     public Hospede getTitular() { return titular; }
-    public void adicionarHospede(Hospede hospede) { hospedes.add(hospede); }
+
+    public void adicionarHospede(Hospede hospede) {
+        if (hospede == null) {
+            throw new IllegalStateException();
+        }
+        hospedes.add(hospede);
+    }
+    
     public List<Hospede> getHospedes() { return hospedes; }
 }
