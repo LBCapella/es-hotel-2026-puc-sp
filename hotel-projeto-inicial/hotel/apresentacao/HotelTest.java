@@ -18,6 +18,7 @@ public class HotelTest {
 
         // Ciclo 2 - Apartamento (Reserva & Cancelamento)
         testarReservaPodeTerVariosHospedes();
+        testarReservaNaoPermiteHospedeNulo();
 
         testarReservarApartamentoLivre();
         testarReservarApartamentoNaoLivreLancaExcecao();
@@ -140,6 +141,30 @@ public class HotelTest {
         }
     }
 
+    static void testarReservaNaoPermiteHospedeNulo() {
+        total++;
+        try {
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+
+            Reserva reserva = new Reserva(1, titular);
+            boolean rejeitouNulo = true;
+
+            try {
+                reserva.adicionarHospede(null);
+                rejeitouNulo = false;
+            } catch (Exception e) {
+            }
+
+            if (rejeitouNulo) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarReservaNaoPermiteHospedeNulo - Reserva permitiu adicionar hóspede nulo");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarReservaNaoPermiteHospedeNulo - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
     static void testarReservarApartamentoLivre() {
         total++;
         try {
@@ -157,6 +182,8 @@ public class HotelTest {
             System.out.println("FALHOU: testarReservarApartamentoLivre - Lançou exceção inesperada: " + e.getMessage());
         }
     }
+
+
 
     static void testarReservarApartamentoNaoLivreLancaExcecao() {
         total++;
