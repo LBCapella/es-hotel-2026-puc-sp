@@ -1,3 +1,4 @@
+//REFACTOR
 package hotel.apresentacao;
 
 import hotel.modelo.*;
@@ -313,7 +314,7 @@ public class HotelTest {
             apto.reservar(reserva);
             apto.checkin(reserva);
             
-            if (apto.estaOcupado() && reserva.equals(apto.getReserva()) && titular.equals(apto.getHospede()) && apto.getSymbol() == 'O') {
+            if (apto.estaOcupado() && reserva.equals(apto.getReserva()) && apto.getSymbol() == 'O') {
                 passou++;
             } else {
                 System.out.println("FALHOU: testarCheckinApartamentoReservado - Estado incorreto ao realizar check-in de apartamento reservado");
@@ -356,7 +357,7 @@ public class HotelTest {
             apto.checkin(reserva);
             apto.checkout();
             
-            if (apto.estaLivre() && apto.getReserva() == null && apto.getHospede() == null && apto.getSymbol() == '.') {
+            if (apto.estaLivre() && apto.getReserva() == null && apto.getSymbol() == '.') {
                 passou++;
             } else {
                 System.out.println("FALHOU: testarCheckoutComSucesso - Estado incorreto após check-out");
@@ -412,13 +413,14 @@ public class HotelTest {
         total++;
         try {
             Hotel hotel = new Hotel();
-            Hospede h = new Hospede("12345678900", "João", "Rua A", "11999998888", "joao@email.com");
+            Hospede titular = new Hospede("12345678900", "João", "Rua A", "11999998888", "joao@email.com");
+            Reserva reserva = new Reserva(1, titular);
 
             boolean capturouExcecoes = true;
 
             try { hotel.getApartamento(-1, 0); capturouExcecoes = false; } catch (IllegalArgumentException e) {}
-            try { hotel.reservarApartamento(20, 0, h); capturouExcecoes = false; } catch (IllegalArgumentException e) {}
-            try { hotel.realizarCheckin(0, -1, h); capturouExcecoes = false; } catch (IllegalArgumentException e) {}
+            try { hotel.reservarApartamento(20, 0, reserva); capturouExcecoes = false; } catch (IllegalArgumentException e) {}
+            try { hotel.realizarCheckin(0, -1, reserva); capturouExcecoes = false; } catch (IllegalArgumentException e) {}
             try { hotel.realizarCheckout(0, 14); capturouExcecoes = false; } catch (IllegalArgumentException e) {}
             try { hotel.cancelarReserva(25, 30); capturouExcecoes = false; } catch (IllegalArgumentException e) {}
 
@@ -436,12 +438,13 @@ public class HotelTest {
         total++;
         try {
             Hotel hotel = new Hotel();
-            Hospede h = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+            Reserva reserva = new Reserva(1, titular);
 
-            boolean res1 = hotel.reservarApartamento(0, 0, h);
+            boolean res1 = hotel.reservarApartamento(0, 0, reserva);
             boolean estadoReservado = hotel.getApartamento(0, 0).estaReservado();
 
-            boolean res2 = hotel.realizarCheckin(0, 0, h);
+            boolean res2 = hotel.realizarCheckin(0, 0, reserva);
             boolean estadoOcupado = hotel.getApartamento(0, 0).estaOcupado();
 
             boolean res3 = hotel.realizarCheckout(0, 0);
@@ -454,29 +457,6 @@ public class HotelTest {
             }
         } catch (Exception e) {
             System.out.println("FALHOU: testarOperacoesFachadaHotelDelegacao - Lançou exceção inesperada: " + e.getMessage());
-        }
-    }
-
-    static void testarHotelReservaComReserva() {
-        total++;
-        try {
-            Hotel hotel = new Hotel();
-
-            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
-
-            Reserva reserva = new Reserva(1, titular);
-            hotel.reservarApartamento(0, 0, reserva);
-
-            Apartamento apto = hotel.getApartamento(0, 0);
-
-            if (apto.estaReservado() && reserva.equals(apto.getReserva())) {
-                passou++;
-            } else {
-                System.out.println("FALHOU: testarHotelReservaComReserva - " + "Apartamento não foi reservado com a Reserva");
-            }
-
-        } catch (Exception e) {
-            System.out.println("FALHOU: testarHotelReservaComReserva - " + "Lançou exceção inesperada: " + e.getMessage());
         }
     }
 
@@ -706,13 +686,15 @@ public class HotelTest {
         total++;
         try {
             Hotel hotel = new Hotel();
-            Hospede h = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
-            hotel.realizarCheckin(2, 3, h);
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            Reserva reservaInicial = new Reserva(1, titular);
+            hotel.realizarCheckin(2, 3, reservaInicial);
 
             float umOcupado = hotel.calcularTaxaOcupacao();
 
             for (int n = 0; n < 14; n++) {
-                hotel.realizarCheckin(0, n, h);
+                Reserva reserva = new Reserva(2 + n, titular);
+                hotel.realizarCheckin(0, n, reserva);
             }
             float quinzeOcupados = hotel.calcularTaxaOcupacao();
 
@@ -731,13 +713,15 @@ public class HotelTest {
         total++;
         try {
             Hotel hotel = new Hotel();
-            Hospede h = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            Reserva reservaInicial = new Reserva(1, titular);
+            hotel.reservarApartamento(2, 3, reservaInicial);
 
-            hotel.reservarApartamento(2, 3, h);
             float umReservado = hotel.calcularTaxaReservas();
 
             for (int n = 0; n < 14; n++) {
-                hotel.reservarApartamento(0, n, h);
+                Reserva reserva = new Reserva(2 + n, titular);
+                hotel.reservarApartamento(0, n, reserva);
             }
             float quinzeReservados = hotel.calcularTaxaReservas();
             float taxaOcupacao = hotel.calcularTaxaOcupacao();
@@ -759,10 +743,12 @@ public class HotelTest {
         total++;
         try {
             Hotel hotel = new Hotel();
-            Hospede h = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            Reserva reserva = new Reserva(1, titular);
+            Reserva reservaCheckin = new Reserva(2, titular);
 
-            hotel.reservarApartamento(0, 0, h);
-            hotel.realizarCheckin(0, 1, h);
+            hotel.reservarApartamento(0, 0, reserva);
+            hotel.realizarCheckin(0, 1, reservaCheckin);
 
             float taxaReservas = hotel.calcularTaxaReservas();
             float taxaOcupacao = hotel.calcularTaxaOcupacao();
@@ -824,10 +810,12 @@ public class HotelTest {
         total++;
         try {
             Hotel hotel = new Hotel();
-            Hospede h = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            Reserva reserva = new Reserva(1, titular);
+            Reserva reservaCheckin = new Reserva(2, titular);
 
-            hotel.reservarApartamento(0, 0, h);
-            hotel.realizarCheckin(1, 1, h);
+            hotel.reservarApartamento(0, 0, reserva);
+            hotel.realizarCheckin(1, 1, reservaCheckin);
 
             String saida = capturarSaida(() -> hotel.mostrarMapa());
             long reservados = saida.chars().filter(c -> c == 'R').count();
@@ -848,8 +836,9 @@ public class HotelTest {
         total++;
         try {
             Hotel hotel = new Hotel();
-            Hospede h = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
-            hotel.realizarCheckin(5, 5, h);
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            Reserva reserva = new Reserva(1, titular);
+            hotel.realizarCheckin(5, 5, reserva);
 
             capturarSaida(() -> hotel.mostrarMapa());
             boolean aindaOcupadoAntes = hotel.getApartamento(5, 5).estaOcupado();

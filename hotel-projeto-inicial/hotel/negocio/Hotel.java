@@ -51,22 +51,14 @@ public class Hotel implements Serializable {
      *
      * @param andar Número do andar (0 a 19)
      * @param numero Número do apartamento no andar (0 a 13)
-     * @param hospede Dados do hóspede que realizará a reserva
+     * @param reserva Reserva que será associada ao apartamento
      * @return true se a reserva foi realizada com sucesso
      * @throws IllegalArgumentException se o andar ou o número forem inválidos
      * @throws IllegalStateException se o apartamento não estiver LIVRE
      *
      * @pre O andar e número devem ser válidos e o apartamento deve estar LIVRE
-     * @post O apartamento nas coordenadas dadas terá status RESERVADO e hóspede associado
+     * @post O apartamento nas coordenadas dadas terá status RESERVADO e estará associado à reserva informada
      */
-    public boolean reservarApartamento(int andar, int numero, Hospede hospede) {
-        if (!aptoValido(andar, numero)) {
-            throw new IllegalArgumentException("Andar ou numero invalido");
-        }
-        matriz[andar][numero].reservar(hospede);
-        return true;
-    }
-
     public boolean reservarApartamento(int andar, int numero, Reserva reserva) {
         if (!aptoValido(andar, numero)) {
             throw new IllegalArgumentException("Andar ou numero invalido");
@@ -80,19 +72,19 @@ public class Hotel implements Serializable {
      *
      * @param andar Número do andar (0 a 19)
      * @param numero Número do apartamento no andar (0 a 13)
-     * @param hospede Dados do hóspede que realizará o check-in
+     * @param reserva Reserva associada ao hóspede que realizará o check-in
      * @return true se o check-in foi realizado com sucesso
      * @throws IllegalArgumentException se o andar ou o número forem inválidos
      * @throws IllegalStateException se o apartamento já estiver OCUPADO
      *
      * @pre O andar e número devem ser válidos e o apartamento deve estar LIVRE ou RESERVADO
-     * @post O apartamento nas coordenadas dadas terá status OCUPADO e hóspede associado
+     * @post O apartamento nas coordenadas dadas terá status OCUPADO e estará associado à reserva informada
      */
-    public boolean realizarCheckin(int andar, int numero, Hospede hospede) {
+    public boolean realizarCheckin(int andar, int numero, Reserva reserva) {
         if (!aptoValido(andar, numero)) {
             throw new IllegalArgumentException("Andar ou numero invalido");
         }
-        matriz[andar][numero].checkin(hospede);
+        matriz[andar][numero].checkin(reserva);
         return true;
     }
 
@@ -106,7 +98,7 @@ public class Hotel implements Serializable {
      * @throws IllegalStateException se o apartamento não estiver OCUPADO
      *
      * @pre O andar e número devem ser válidos e o apartamento deve estar OCUPADO
-     * @post O apartamento nas coordenadas dadas terá status LIVRE e hóspede nulo
+     * @post O apartamento nas coordenadas dadas terá status LIVRE e sem reserva associada
      */
     public boolean realizarCheckout(int andar, int numero) {
         if (!aptoValido(andar, numero)) {
@@ -126,7 +118,7 @@ public class Hotel implements Serializable {
      * @throws IllegalStateException se o apartamento não estiver RESERVADO
      *
      * @pre O andar e número devem ser válidos e o apartamento deve estar RESERVADO
-     * @post O apartamento nas coordenadas dadas terá status LIVRE e hóspede nulo
+     * @post O apartamento nas coordenadas dadas terá status LIVRE e sem reserva associada
      */
     public boolean cancelarReserva(int andar, int numero) {
         if (!aptoValido(andar, numero)) {
