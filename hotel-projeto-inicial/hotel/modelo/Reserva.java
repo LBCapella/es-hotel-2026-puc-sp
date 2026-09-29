@@ -33,5 +33,5 @@ public class Reserva {
         hospedes.add(hospede);
     }
 
-    public List<Hospede> getHospedes() { return hospedes; }
+    public List<Hospede> getHospedes() { return new ArrayList<>(hospedes); }
 }
