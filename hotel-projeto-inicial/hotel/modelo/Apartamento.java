@@ -8,6 +8,7 @@ import java.io.Serializable;
 public class Apartamento implements Serializable {
     private Status status;
     private Hospede hospede;
+    private Reserva reserva;
 
     /**
      * Constrói um Apartamento no estado inicial LIVRE e sem hóspede associado.
@@ -57,6 +58,28 @@ public class Apartamento implements Serializable {
         }
         this.status = Status.RESERVADO;
         this.hospede = h;
+    }
+
+    /**
+     * Associa uma reserva ao apartamento e altera seu status para RESERVADO.
+     *
+     * @param reserva Reserva que será associada ao apartamento
+     * @throws IllegalArgumentException se a reserva for nula
+     * @throws IllegalStateException se o apartamento não estiver no status LIVRE
+     *
+     * @pre O apartamento deve estar com status LIVRE e a reserva não pode ser nula
+     * @post O apartamento fica com status RESERVADO e associado à reserva informada
+     */
+    public void reservar(Reserva reserva) {
+        if (reserva == null) {
+            throw new IllegalArgumentException("Reserva não pode ser nula para reserva.");
+        }
+        if (status != Status.LIVRE) {
+            throw new IllegalStateException("Apartamento não está livre para ser reservado.");
+        }
+
+        this.status = Status.RESERVADO;
+        this.reserva = reserva;
     }
 
     /**
