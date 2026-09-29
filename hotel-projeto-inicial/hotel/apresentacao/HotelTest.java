@@ -20,6 +20,7 @@ public class HotelTest {
         testarReservaPodeTerVariosHospedes();
         testarReservaNaoPermiteHospedeNulo();
         testarReservaNaoPermiteTitularNulo();
+        testarApartamentoReservadoComReserva();
 
         testarReservarApartamentoLivre();
         testarReservarApartamentoNaoLivreLancaExcecao();
@@ -179,6 +180,29 @@ public class HotelTest {
         }
     }
 
+    static void testarApartamentoReservadoComReserva() {
+        total++;
+        try {
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+            Hospede hospede = new Hospede("98765432100", "Maria Silva", "Rua B", "11988887777", "maria@email.com");
+
+            Reserva reserva = new Reserva(1, titular);
+            reserva.adicionarHospede(hospede);
+
+            Apartamento apto = new Apartamento();
+
+            apto.reservar(reserva);
+
+            if (apto.estaReservado() && apto.getSymbol() == 'R') {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarApartamentoReservadoComReserva - Apartamento não ficou reservado corretamente");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarApartamentoReservadoComReserva - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
     static void testarReservarApartamentoLivre() {
         total++;
         try {
@@ -196,8 +220,6 @@ public class HotelTest {
             System.out.println("FALHOU: testarReservarApartamentoLivre - Lançou exceção inesperada: " + e.getMessage());
         }
     }
-
-
 
     static void testarReservarApartamentoNaoLivreLancaExcecao() {
         total++;
