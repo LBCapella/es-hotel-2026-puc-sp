@@ -20,6 +20,10 @@ public class Reserva {
         hospedes.add(titular);
     }
 
+    public int getIdReserva() {
+        return idReserva;
+    }
+
     public Hospede getTitular() { return titular; }
 
     public void adicionarHospede(Hospede hospede) {

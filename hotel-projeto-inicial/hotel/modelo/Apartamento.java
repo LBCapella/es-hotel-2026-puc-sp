@@ -19,6 +19,7 @@ public class Apartamento implements Serializable {
     public Apartamento() {
         this.status = Status.LIVRE;
         this.hospede = null;
+        this.reserva = null;
     }
 
     /**
@@ -38,6 +39,8 @@ public class Apartamento implements Serializable {
      * @post Retorna a referência do hóspede associado
      */
     public Hospede getHospede() { return hospede; }
+
+    public Reserva getReserva() { return reserva; }
 
     /**
      * Realiza a reserva de um apartamento para um hóspede.
@@ -104,6 +107,19 @@ public class Apartamento implements Serializable {
         this.hospede = h;
     }
 
+    public void checkin(Reserva reserva) {
+        if (reserva == null) {
+            throw new IllegalArgumentException("Reserva não pode ser nula para check-in.");
+        }
+        if (status == Status.OCUPADO) {
+            throw new IllegalStateException("Apartamento já está ocupado.");
+        }
+
+        this.status = Status.OCUPADO;
+        this.reserva = reserva;
+        this.hospede = reserva.getTitular();
+    }
+
     /**
      * Realiza o check-out do apartamento, liberando a unidade.
      *
@@ -118,6 +134,7 @@ public class Apartamento implements Serializable {
         }
         this.status = Status.LIVRE;
         this.hospede = null;
+        this.reserva = null;
     }
 
     /**
@@ -134,6 +151,7 @@ public class Apartamento implements Serializable {
         }
         this.status = Status.LIVRE;
         this.hospede = null;
+        this.reserva = null;
     }
 
     /**
