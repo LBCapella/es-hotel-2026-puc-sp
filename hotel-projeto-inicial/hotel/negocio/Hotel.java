@@ -67,6 +67,14 @@ public class Hotel implements Serializable {
         return true;
     }
 
+    public boolean reservarApartamento(int andar, int numero, Reserva reserva) {
+        if (!aptoValido(andar, numero)) {
+            throw new IllegalArgumentException("Andar ou numero invalido");
+        }
+        matriz[andar][numero].reservar(reserva);
+        return true;
+    }
+
     /**
      * Realiza o check-in no apartamento especificado.
      *
