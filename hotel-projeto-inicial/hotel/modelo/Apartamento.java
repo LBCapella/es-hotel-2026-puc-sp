@@ -7,17 +7,17 @@ import java.io.Serializable;
  */
 public class Apartamento implements Serializable {
     private Status status;
-    private Hospede hospede;
+    private Reserva reserva;
 
     /**
-     * Constrói um Apartamento no estado inicial LIVRE e sem hóspede associado.
+     * Constrói um Apartamento no estado inicial LIVRE e sem reserva associada.
      *
      * @pre Nenhuma
-     * @post Instância criada com status LIVRE e hospede null
+     * @post Instância criada com status LIVRE e reserva null
      */
     public Apartamento() {
         this.status = Status.LIVRE;
-        this.hospede = null;
+        this.reserva = null;
     }
 
     /**
@@ -30,55 +30,57 @@ public class Apartamento implements Serializable {
     public Status getStatus() { return status; }
 
     /**
-     * Retorna o hóspede associado ao apartamento.
+     * Retorna a reserva associada ao apartamento.
      *
-     * @return Hospede ou null se o apartamento estiver LIVRE
+     * @return Reserva ou null se o apartamento estiver LIVRE
      * @pre Nenhuma
-     * @post Retorna a referência do hóspede associado
+     * @post Retorna a referência da reserva associada
      */
-    public Hospede getHospede() { return hospede; }
+    public Reserva getReserva() { return reserva; }
 
     /**
-     * Realiza a reserva de um apartamento para um hóspede.
+     * Associa uma reserva ao apartamento e altera seu status para RESERVADO.
      *
-     * @param h Dados do hóspede que realizará a reserva
-     * @throws IllegalArgumentException se o hóspede for nulo
+     * @param reserva Reserva que será associada ao apartamento
+     * @throws IllegalArgumentException se a reserva for nula
      * @throws IllegalStateException se o apartamento não estiver no status LIVRE
      *
-     * @pre O apartamento deve estar com status LIVRE e o hóspede não pode ser nulo
-     * @post O apartamento transiciona para RESERVADO e o hóspede é armazenado
+     * @pre O apartamento deve estar com status LIVRE e a reserva não pode ser nula
+     * @post O apartamento fica com status RESERVADO e associado à reserva informada
      */
-    public void reservar(Hospede h) {
-        if (h == null) {
-            throw new IllegalArgumentException("Hóspede não pode ser nulo para reserva.");
+    public void reservar(Reserva reserva) {
+        if (reserva == null) {
+            throw new IllegalArgumentException("Reserva não pode ser nula para reserva.");
         }
         if (status != Status.LIVRE) {
             throw new IllegalStateException("Apartamento não está livre para ser reservado.");
         }
+
         this.status = Status.RESERVADO;
-        this.hospede = h;
+        this.reserva = reserva;
     }
 
     /**
-     * Realiza o check-in de um hóspede no apartamento.
+     * Realiza o check-in de uma reserva no apartamento.
      * Aceita transição a partir dos status LIVRE ou RESERVADO.
      *
-     * @param h Dados do hóspede que fará o check-in
-     * @throws IllegalArgumentException se o hóspede for nulo
+     * @param reserva Reserva associada ao hóspede que realizará o check-in
+     * @throws IllegalArgumentException se a reserva for nula
      * @throws IllegalStateException se o apartamento já estiver no status OCUPADO
      *
-     * @pre O apartamento deve estar com status LIVRE ou RESERVADO e o hóspede não pode ser nulo
-     * @post O apartamento transiciona para OCUPADO e o hóspede é armazenado
+     * @pre O apartamento deve estar com status LIVRE ou RESERVADO e a reserva não pode ser nula
+     * @post O apartamento transiciona para OCUPADO e fica associado à reserva informada
      */
-    public void checkin(Hospede h) {
-        if (h == null) {
-            throw new IllegalArgumentException("Hóspede não pode ser nulo para check-in.");
+    public void checkin(Reserva reserva) {
+        if (reserva == null) {
+            throw new IllegalArgumentException("Reserva não pode ser nula para check-in.");
         }
         if (status == Status.OCUPADO) {
             throw new IllegalStateException("Apartamento já está ocupado.");
         }
+
         this.status = Status.OCUPADO;
-        this.hospede = h;
+        this.reserva = reserva;
     }
 
     /**
@@ -87,14 +89,14 @@ public class Apartamento implements Serializable {
      * @throws IllegalStateException se o apartamento não estiver no status OCUPADO
      *
      * @pre O apartamento deve estar com status OCUPADO
-     * @post O apartamento transiciona para LIVRE e o hóspede torna-se null
+     * @post O apartamento transiciona para LIVRE e a reserva torna-se null
      */
     public void checkout() {
         if (status != Status.OCUPADO) {
             throw new IllegalStateException("Apenas apartamentos ocupados podem realizar check-out.");
         }
         this.status = Status.LIVRE;
-        this.hospede = null;
+        this.reserva = null;
     }
 
     /**
@@ -103,14 +105,14 @@ public class Apartamento implements Serializable {
      * @throws IllegalStateException se o apartamento não estiver no status RESERVADO
      *
      * @pre O apartamento deve estar com status RESERVADO
-     * @post O apartamento transiciona para LIVRE e o hóspede torna-se null
+     * @post O apartamento transiciona para LIVRE e a reserva torna-se null
      */
     public void cancelarReserva() {
         if (status != Status.RESERVADO) {
             throw new IllegalStateException("Apenas apartamentos reservados podem ter a reserva cancelada.");
         }
         this.status = Status.LIVRE;
-        this.hospede = null;
+        this.reserva = null;
     }
 
     /**
@@ -163,5 +165,18 @@ public class Apartamento implements Serializable {
             case OCUPADO: return 'O';
             default: return '?';
         }
+    }
+
+    /**
+     * Retorna uma representação textual do apartamento, com o tipo concreto, o status
+     * atual e o valor da diária.
+     *
+     * @return String no formato "Tipo [STATUS] diária R$ valor"
+     * @pre Nenhuma
+     * @post Nenhuma alteração de estado
+     */
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + " [" + status + "] diária R$ " + getPrecoDiaria();
     }
 }
