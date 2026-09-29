@@ -5,6 +5,7 @@ import hotel.negocio.Hotel;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class HotelTest {
     private static int passou = 0;
@@ -21,6 +22,7 @@ public class HotelTest {
         testarReservaNaoPermiteHospedeNulo();
         testarReservaNaoPermiteTitularNulo();
         testarApartamentoReservadoComReserva();
+        testarReservaNaoPermiteAlteracaoExternaDaLista();
 
         testarReservarApartamentoLivre();
         testarReservarApartamentoNaoLivreLancaExcecao();
@@ -199,6 +201,29 @@ public class HotelTest {
             }
         } catch (Exception e) {
             System.out.println("FALHOU: testarApartamentoReservadoComReserva - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarReservaNaoPermiteAlteracaoExternaDaLista() {
+        total++;
+        try {
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+            Hospede hospede = new Hospede( "98765432100", "Maria Silva", "Rua B", "11888887777", "maria@email.com");
+
+            Reserva reserva = new Reserva(1, titular);
+            reserva.adicionarHospede(hospede);
+
+            List<Hospede> hospedes = reserva.getHospedes();
+            hospedes.clear();
+
+            if (reserva.getHospedes().size() == 2) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarReservaNaoPermiteAlteracaoExternaDaLista - " + "A lista interna da reserva foi alterada externamente");
+            }
+
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarReservaNaoPermiteAlteracaoExternaDaLista - " + "Lançou exceção inesperada: " + e.getMessage());
         }
     }
 
