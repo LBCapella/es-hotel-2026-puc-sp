@@ -9,6 +9,10 @@ public class Reserva {
     private List<Hospede> hospedes;
 
     public Reserva(int idReserva, Hospede titular) {
+        if (titular == null) {
+            throw new IllegalStateException();
+        }
+
         this.idReserva = idReserva;
         this.titular = titular;
         this.hospedes = new ArrayList<>();
@@ -24,6 +28,6 @@ public class Reserva {
         }
         hospedes.add(hospede);
     }
-    
+
     public List<Hospede> getHospedes() { return hospedes; }
 }
