@@ -80,8 +80,14 @@ public class Main {
                     case 2:
                         andar = lerAndar();
                         numero = lerNumero();
-                        h = lerHospede();
-                        reserva = new Reserva(proximoIdReserva++, h);
+                        Apartamento aptoCheckin = hotel.getApartamento(andar, numero);
+                        if (aptoCheckin.estaReservado()) {
+                            reserva = aptoCheckin.getReserva();
+                            System.out.println("Reserva existente encontrada para " + reserva.getTitular() + ".");
+                        } else {
+                            h = lerHospede();
+                            reserva = new Reserva(proximoIdReserva++, h);
+                        }
                         if (hotel.realizarCheckin(andar, numero, reserva)) {
                             System.out.println("Check-in realizado com sucesso.");
                         } else {
