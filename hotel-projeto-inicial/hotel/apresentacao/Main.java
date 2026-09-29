@@ -9,6 +9,7 @@ import java.util.Scanner;
 public class Main {
     private static Hotel hotel = new Hotel();
     private static Scanner scanner = new Scanner(System.in);
+    private static int proximoIdReserva = 1;
 
     private static Hospede lerHospede() {
         System.out.print("CPF: ");
@@ -69,7 +70,8 @@ public class Main {
                         int andar = lerAndar();
                         int numero = lerNumero();
                         Hospede h = lerHospede();
-                        if (hotel.reservarApartamento(andar, numero, h)) {
+                        Reserva reserva = new Reserva(proximoIdReserva++, h);
+                        if (hotel.reservarApartamento(andar, numero, reserva)) {
                             System.out.println("Reserva realizada com sucesso.");
                         } else {
                             System.out.println("Não foi possível reservar.");
@@ -79,7 +81,8 @@ public class Main {
                         andar = lerAndar();
                         numero = lerNumero();
                         h = lerHospede();
-                        if (hotel.realizarCheckin(andar, numero, h)) {
+                        reserva = new Reserva(proximoIdReserva++, h);
+                        if (hotel.realizarCheckin(andar, numero, reserva)) {
                             System.out.println("Check-in realizado com sucesso.");
                         } else {
                             System.out.println("Não foi possível realizar check-in.");
