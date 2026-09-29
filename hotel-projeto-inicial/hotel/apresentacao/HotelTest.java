@@ -19,6 +19,7 @@ public class HotelTest {
         // Ciclo 2 - Apartamento (Reserva & Cancelamento)
         testarReservaPodeTerVariosHospedes();
         testarReservaNaoPermiteHospedeNulo();
+        testarReservaNaoPermiteTitularNulo();
 
         testarReservarApartamentoLivre();
         testarReservarApartamentoNaoLivreLancaExcecao();
@@ -162,6 +163,19 @@ public class HotelTest {
             }
         } catch (Exception e) {
             System.out.println("FALHOU: testarReservaNaoPermiteHospedeNulo - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarReservaNaoPermiteTitularNulo() {
+        total++;
+        try {
+            new Reserva(1, null);
+
+            System.out.println("FALHOU: testarReservaNaoPermiteTitularNulo - Reserva permitiu titular nulo");
+        } catch (IllegalStateException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarReservaNaoPermiteTitularNulo - Lançou exceção inesperada: " + e.getMessage());
         }
     }
 
