@@ -65,6 +65,11 @@ public class HotelTest {
         testarMostrarMapaRefleteReservaECheckin();
         testarMostrarMapaNaoAlteraEstado();
 
+        // Ciclo 9 - Servico
+        testarCriacaoServicoValido();
+        testarServicoNomeNuloLancaExcecao();
+        testarServicoPrecoNegativoLancaExcecao();
+
         System.out.println(passou + "/" + total + " testes passaram");
         
         if (passou < total) {
@@ -853,6 +858,46 @@ public class HotelTest {
             }
         } catch (Exception e) {
             System.out.println("FALHOU: testarMostrarMapaNaoAlteraEstado - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    // --- CICLO 9 ---
+
+    static void testarCriacaoServicoValido() {
+        total++;
+        try {
+            Servico s = new Servico("Jantar", 80.0f);
+            if ("Jantar".equals(s.getNome()) && s.getPreco() == 80.0f) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarCriacaoServicoValido - Getters retornaram valores inconsistentes");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCriacaoServicoValido - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarServicoNomeNuloLancaExcecao() {
+        total++;
+        try {
+            new Servico(null, 80.0f);
+            System.out.println("FALHOU: testarServicoNomeNuloLancaExcecao - Permitiu criar Servico com nome nulo");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarServicoNomeNuloLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarServicoPrecoNegativoLancaExcecao() {
+        total++;
+        try {
+            new Servico("Jantar", -1.0f);
+            System.out.println("FALHOU: testarServicoPrecoNegativoLancaExcecao - Permitiu criar Servico com preço negativo");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarServicoPrecoNegativoLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
         }
     }
 }
