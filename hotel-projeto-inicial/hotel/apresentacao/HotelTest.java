@@ -70,6 +70,12 @@ public class HotelTest {
         testarServicoNomeNuloLancaExcecao();
         testarServicoPrecoNegativoLancaExcecao();
 
+        // Ciclo 10 - Consumo
+        testarCriacaoConsumoValido();
+        testarConsumoApartamentoNuloLancaExcecao();
+        testarConsumoServicoNuloLancaExcecao();
+        testarConsumoQuantidadeInvalidaLancaExcecao();
+
         System.out.println(passou + "/" + total + " testes passaram");
         
         if (passou < total) {
@@ -898,6 +904,63 @@ public class HotelTest {
             passou++;
         } catch (Exception e) {
             System.out.println("FALHOU: testarServicoPrecoNegativoLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    // --- CICLO 10 ---
+
+    static void testarCriacaoConsumoValido() {
+        total++;
+        try {
+            Apartamento apto = new ApartamentoSimples();
+            Servico servico = new Servico("Jantar", 80.0f);
+            Consumo consumo = new Consumo(apto, servico, 3);
+            if (consumo.getApartamento() == apto &&
+                consumo.getServico() == servico &&
+                consumo.getQuantidade() == 3 &&
+                consumo.getTotal() == 240.0f) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarCriacaoConsumoValido - Getters ou total retornaram valores inconsistentes");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCriacaoConsumoValido - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarConsumoApartamentoNuloLancaExcecao() {
+        total++;
+        try {
+            new Consumo(null, new Servico("Jantar", 80.0f), 1);
+            System.out.println("FALHOU: testarConsumoApartamentoNuloLancaExcecao - Permitiu criar Consumo com apartamento nulo");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarConsumoApartamentoNuloLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarConsumoServicoNuloLancaExcecao() {
+        total++;
+        try {
+            new Consumo(new ApartamentoSimples(), null, 1);
+            System.out.println("FALHOU: testarConsumoServicoNuloLancaExcecao - Permitiu criar Consumo com serviço nulo");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarConsumoServicoNuloLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarConsumoQuantidadeInvalidaLancaExcecao() {
+        total++;
+        try {
+            new Consumo(new ApartamentoSimples(), new Servico("Jantar", 80.0f), 0);
+            System.out.println("FALHOU: testarConsumoQuantidadeInvalidaLancaExcecao - Permitiu criar Consumo com quantidade zero");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarConsumoQuantidadeInvalidaLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
         }
     }
 }
