@@ -94,6 +94,13 @@ public class HotelTest {
         testarConsumosDoApartamentoSemConsumosRetornaListaVazia();
         testarConsumosDoApartamentoCoordenadasInvalidasLancaExcecao();
 
+        // Ciclo 14 - Fatura
+        testarFaturaCalculaTotais();
+        testarFaturaSemConsumos();
+        testarFaturaApartamentoNuloLancaExcecao();
+        testarFaturaDiasNegativosLancaExcecao();
+        testarFaturaConsumosNulosLancaExcecao();
+
         System.out.println(passou + "/" + total + " testes passaram");
         
         if (passou < total) {
@@ -1205,6 +1212,88 @@ public class HotelTest {
             passou++;
         } catch (Exception e) {
             System.out.println("FALHOU: testarConsumosDoApartamentoCoordenadasInvalidasLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    // --- CICLO 14 ---
+
+    static void testarFaturaCalculaTotais() {
+        total++;
+        try {
+            Apartamento apto = new ApartamentoPremium();
+            List<Consumo> consumos = new java.util.ArrayList<>();
+            consumos.add(new Consumo(apto, new Servico("Jantar", 80.0f), 2));
+            consumos.add(new Consumo(apto, new Servico("Lavanderia", 40.0f), 1));
+
+            Fatura fatura = new Fatura(apto, 3, consumos);
+
+            if (fatura.getApartamento() == apto &&
+                fatura.getDias() == 3 &&
+                fatura.getConsumos().size() == 2 &&
+                fatura.getTotalDiarias() == 1050.0f &&
+                fatura.getTotalConsumos() == 200.0f &&
+                fatura.getTotalGeral() == 1250.0f) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarFaturaCalculaTotais - Totais incorretos: diárias " + fatura.getTotalDiarias()
+                        + " (esperado 1050.0), consumos " + fatura.getTotalConsumos()
+                        + " (esperado 200.0), geral " + fatura.getTotalGeral() + " (esperado 1250.0)");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarFaturaCalculaTotais - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarFaturaSemConsumos() {
+        total++;
+        try {
+            Fatura fatura = new Fatura(new ApartamentoSimples(), 2, new java.util.ArrayList<>());
+
+            if (fatura.getTotalDiarias() == 300.0f &&
+                fatura.getTotalConsumos() == 0.0f &&
+                fatura.getTotalGeral() == 300.0f) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarFaturaSemConsumos - Total geral " + fatura.getTotalGeral() + " (esperado 300.0)");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarFaturaSemConsumos - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarFaturaApartamentoNuloLancaExcecao() {
+        total++;
+        try {
+            new Fatura(null, 1, new java.util.ArrayList<>());
+            System.out.println("FALHOU: testarFaturaApartamentoNuloLancaExcecao - Permitiu criar Fatura com apartamento nulo");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarFaturaApartamentoNuloLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarFaturaDiasNegativosLancaExcecao() {
+        total++;
+        try {
+            new Fatura(new ApartamentoSimples(), -1, new java.util.ArrayList<>());
+            System.out.println("FALHOU: testarFaturaDiasNegativosLancaExcecao - Permitiu criar Fatura com dias negativos");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarFaturaDiasNegativosLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarFaturaConsumosNulosLancaExcecao() {
+        total++;
+        try {
+            new Fatura(new ApartamentoSimples(), 1, null);
+            System.out.println("FALHOU: testarFaturaConsumosNulosLancaExcecao - Permitiu criar Fatura com lista de consumos nula");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarFaturaConsumosNulosLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
         }
     }
 }
