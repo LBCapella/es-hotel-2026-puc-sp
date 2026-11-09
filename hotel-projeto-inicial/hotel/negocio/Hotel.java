@@ -234,7 +234,13 @@ public class Hotel implements Serializable {
         if (!aptoValido(andar, numero)) {
             throw new IllegalArgumentException("Andar ou numero invalido");
         }
-        throw new UnsupportedOperationException("Implementar getConsumosDoApartamento");
+        ArrayList<Consumo> resultado = new ArrayList<>();
+        for (Consumo c : consumos) {
+            if (c.getApartamento() == matriz[andar][numero]) {
+                resultado.add(c);
+            }
+        }
+        return resultado;
     }
 
     public Fatura emitirFatura(int andar, int numero, int dias) {
