@@ -89,6 +89,11 @@ public class HotelTest {
         testarRegistrarConsumoIndiceServicoInvalidoLancaExcecao();
         testarRegistrarConsumoQuantidadeInvalidaLancaExcecao();
 
+        // Ciclo 13 - Hotel getConsumosDoApartamento
+        testarConsumosDoApartamentoRetornaApenasDoApartamento();
+        testarConsumosDoApartamentoSemConsumosRetornaListaVazia();
+        testarConsumosDoApartamentoCoordenadasInvalidasLancaExcecao();
+
         System.out.println(passou + "/" + total + " testes passaram");
         
         if (passou < total) {
@@ -1133,6 +1138,73 @@ public class HotelTest {
             passou++;
         } catch (Exception e) {
             System.out.println("FALHOU: testarRegistrarConsumoQuantidadeInvalidaLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    // --- CICLO 13 ---
+
+    static void testarConsumosDoApartamentoRetornaApenasDoApartamento() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular1 = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            Hospede titular2 = new Hospede("98765432100", "Maria Souza", "Rua B, 456", "11888887777", "maria@email.com");
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.cadastrarServico("Lavanderia", 40.0f);
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular1));
+            hotel.realizarCheckin(0, 1, new Reserva(2, titular2));
+            hotel.registrarConsumo(0, 0, 0, 1);
+            hotel.registrarConsumo(0, 1, 1, 3);
+            hotel.registrarConsumo(0, 0, 1, 2);
+
+            List<Consumo> consumos00 = hotel.getConsumosDoApartamento(0, 0);
+            List<Consumo> consumos01 = hotel.getConsumosDoApartamento(0, 1);
+
+            if (consumos00.size() == 2 &&
+                consumos01.size() == 1 &&
+                consumos00.get(0).getApartamento() == hotel.getApartamento(0, 0) &&
+                consumos00.get(1).getApartamento() == hotel.getApartamento(0, 0) &&
+                consumos01.get(0).getApartamento() == hotel.getApartamento(0, 1) &&
+                consumos01.get(0).getQuantidade() == 3) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarConsumosDoApartamentoRetornaApenasDoApartamento - Consumos não foram filtrados corretamente por apartamento");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarConsumosDoApartamentoRetornaApenasDoApartamento - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarConsumosDoApartamentoSemConsumosRetornaListaVazia() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular));
+            hotel.realizarCheckin(0, 1, new Reserva(2, titular));
+            hotel.registrarConsumo(0, 1, 0, 1);
+
+            if (hotel.getConsumosDoApartamento(0, 0).isEmpty()) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarConsumosDoApartamentoSemConsumosRetornaListaVazia - Retornou consumos de outro apartamento");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarConsumosDoApartamentoSemConsumosRetornaListaVazia - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarConsumosDoApartamentoCoordenadasInvalidasLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            hotel.getConsumosDoApartamento(0, 14);
+            System.out.println("FALHOU: testarConsumosDoApartamentoCoordenadasInvalidasLancaExcecao - Permitiu consultar consumos com número de apartamento inválido");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarConsumosDoApartamentoCoordenadasInvalidasLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
         }
     }
 }
