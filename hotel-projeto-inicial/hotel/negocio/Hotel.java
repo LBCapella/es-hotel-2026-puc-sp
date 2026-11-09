@@ -230,6 +230,17 @@ public class Hotel implements Serializable {
         return true;
     }
 
+    /**
+     * Obtém os consumos de serviços registrados em um apartamento.
+     *
+     * @param andar Número do andar (0 a 19)
+     * @param numero Número do apartamento no andar (0 a 13)
+     * @return ArrayList com os consumos do apartamento (vazia se não houver nenhum)
+     * @throws IllegalArgumentException se o andar ou o número forem inválidos
+     *
+     * @pre O andar e o número devem ser válidos
+     * @post Nenhuma alteração de estado; retorna uma nova lista apenas com os consumos do apartamento
+     */
     public ArrayList<Consumo> getConsumosDoApartamento(int andar, int numero) {
         if (!aptoValido(andar, numero)) {
             throw new IllegalArgumentException("Andar ou numero invalido");
