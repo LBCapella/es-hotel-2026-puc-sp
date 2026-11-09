@@ -201,6 +201,20 @@ public class Hotel implements Serializable {
         servicos.add(new Servico(nome, preco));
     }
 
+    /**
+     * Registra o consumo de um serviço do cardápio em um apartamento ocupado.
+     *
+     * @param andar Número do andar (0 a 19)
+     * @param numero Número do apartamento no andar (0 a 13)
+     * @param indiceServico Posição do serviço na lista de serviços cadastrados
+     * @param quantidade Quantidade consumida
+     * @return true se o consumo foi registrado com sucesso
+     * @throws IllegalArgumentException se o andar, o número, o índice do serviço ou a quantidade forem inválidos
+     * @throws IllegalStateException se o apartamento não estiver OCUPADO
+     *
+     * @pre O apartamento deve estar OCUPADO, o serviço deve estar cadastrado e a quantidade deve ser maior que zero
+     * @post Um Consumo é adicionado à lista de consumos do hotel
+     */
     public boolean registrarConsumo(int andar, int numero, int indiceServico, int quantidade) {
         if (!aptoValido(andar, numero)) {
             throw new IllegalArgumentException("Andar ou numero invalido");
