@@ -254,6 +254,19 @@ public class Hotel implements Serializable {
         return resultado;
     }
 
+    /**
+     * Emite a fatura de um apartamento ocupado, somando as diárias e os consumos de serviços.
+     *
+     * @param andar Número do andar (0 a 19)
+     * @param numero Número do apartamento no andar (0 a 13)
+     * @param dias Quantidade de diárias a faturar
+     * @return Fatura com o total das diárias e dos consumos do apartamento
+     * @throws IllegalArgumentException se o andar, o número ou a quantidade de dias forem inválidos
+     * @throws IllegalStateException se o apartamento não estiver OCUPADO
+     *
+     * @pre O apartamento deve estar OCUPADO e os dias não podem ser negativos
+     * @post Nenhuma alteração de estado; retorna a Fatura calculada
+     */
     public Fatura emitirFatura(int andar, int numero, int dias) {
         if (!aptoValido(andar, numero)) {
             throw new IllegalArgumentException("Andar ou numero invalido");
