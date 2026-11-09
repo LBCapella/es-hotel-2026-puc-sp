@@ -101,6 +101,14 @@ public class HotelTest {
         testarFaturaDiasNegativosLancaExcecao();
         testarFaturaConsumosNulosLancaExcecao();
 
+        // Ciclo 15 - Hotel emitirFatura
+        testarEmitirFaturaApartamentoSimplesComConsumos();
+        testarEmitirFaturaApartamentoPremium();
+        testarEmitirFaturaApartamentoLivreLancaExcecao();
+        testarEmitirFaturaApartamentoReservadoLancaExcecao();
+        testarEmitirFaturaCoordenadasInvalidasLancaExcecao();
+        testarEmitirFaturaDiasNegativosLancaExcecao();
+
         System.out.println(passou + "/" + total + " testes passaram");
         
         if (passou < total) {
@@ -1294,6 +1302,119 @@ public class HotelTest {
             passou++;
         } catch (Exception e) {
             System.out.println("FALHOU: testarFaturaConsumosNulosLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    // --- CICLO 15 ---
+
+    static void testarEmitirFaturaApartamentoSimplesComConsumos() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular1 = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            Hospede titular2 = new Hospede("98765432100", "Maria Souza", "Rua B, 456", "11888887777", "maria@email.com");
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular1));
+            hotel.realizarCheckin(0, 1, new Reserva(2, titular2));
+            hotel.registrarConsumo(0, 0, 0, 2);
+            hotel.registrarConsumo(0, 1, 0, 5);
+
+            Fatura fatura = hotel.emitirFatura(0, 0, 2);
+
+            if (fatura.getApartamento() == hotel.getApartamento(0, 0) &&
+                fatura.getDias() == 2 &&
+                fatura.getConsumos().size() == 1 &&
+                fatura.getTotalDiarias() == 300.0f &&
+                fatura.getTotalConsumos() == 160.0f &&
+                fatura.getTotalGeral() == 460.0f) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarEmitirFaturaApartamentoSimplesComConsumos - Fatura incorreta: total geral "
+                        + fatura.getTotalGeral() + " (esperado 460.0), consumos " + fatura.getConsumos().size() + " (esperado 1)");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarEmitirFaturaApartamentoSimplesComConsumos - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarEmitirFaturaApartamentoPremium() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.realizarCheckin(0, Hotel.SIMPLES_POR_ANDAR, new Reserva(1, titular));
+
+            Fatura fatura = hotel.emitirFatura(0, Hotel.SIMPLES_POR_ANDAR, 3);
+
+            if (fatura.getTotalDiarias() == 1050.0f &&
+                fatura.getTotalConsumos() == 0.0f &&
+                fatura.getTotalGeral() == 1050.0f) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarEmitirFaturaApartamentoPremium - Total geral " + fatura.getTotalGeral() + " (esperado 1050.0)");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarEmitirFaturaApartamentoPremium - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarEmitirFaturaApartamentoLivreLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+
+            hotel.emitirFatura(0, 0, 1);
+            System.out.println("FALHOU: testarEmitirFaturaApartamentoLivreLancaExcecao - Permitiu emitir fatura de apartamento livre");
+        } catch (IllegalStateException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarEmitirFaturaApartamentoLivreLancaExcecao - Lançou exceção diferente de IllegalStateException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarEmitirFaturaApartamentoReservadoLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.reservarApartamento(0, 0, new Reserva(1, titular));
+
+            hotel.emitirFatura(0, 0, 1);
+            System.out.println("FALHOU: testarEmitirFaturaApartamentoReservadoLancaExcecao - Permitiu emitir fatura de apartamento reservado");
+        } catch (IllegalStateException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarEmitirFaturaApartamentoReservadoLancaExcecao - Lançou exceção diferente de IllegalStateException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarEmitirFaturaCoordenadasInvalidasLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+
+            hotel.emitirFatura(-1, 0, 1);
+            System.out.println("FALHOU: testarEmitirFaturaCoordenadasInvalidasLancaExcecao - Permitiu emitir fatura com andar inválido");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarEmitirFaturaCoordenadasInvalidasLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarEmitirFaturaDiasNegativosLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular));
+
+            hotel.emitirFatura(0, 0, -1);
+            System.out.println("FALHOU: testarEmitirFaturaDiasNegativosLancaExcecao - Permitiu emitir fatura com dias negativos");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarEmitirFaturaDiasNegativosLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
         }
     }
 }
