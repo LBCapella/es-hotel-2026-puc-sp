@@ -100,7 +100,8 @@ public class Hotel implements Serializable {
      * @throws IllegalStateException se o apartamento não estiver OCUPADO
      *
      * @pre O andar e número devem ser válidos e o apartamento deve estar OCUPADO
-     * @post O apartamento nas coordenadas dadas terá status LIVRE e sem reserva associada
+     * @post O apartamento nas coordenadas dadas terá status LIVRE e sem reserva associada;
+     *       seus consumos deixam de constar em getConsumosDoApartamento, mas permanecem em getConsumos
      */
     public boolean realizarCheckout(int andar, int numero) {
         if (!aptoValido(andar, numero)) {
@@ -216,7 +217,7 @@ public class Hotel implements Serializable {
      * @throws IllegalStateException se o apartamento não estiver OCUPADO
      *
      * @pre O apartamento deve estar OCUPADO, o serviço deve estar cadastrado e a quantidade deve ser maior que zero
-     * @post Um Consumo é adicionado à lista de consumos do hotel
+     * @post Um Consumo é adicionado à lista de consumos do hotel e aos consumos da estadia atual do apartamento
      */
     public boolean registrarConsumo(int andar, int numero, int indiceServico, int quantidade) {
         if (!aptoValido(andar, numero)) {
@@ -236,15 +237,15 @@ public class Hotel implements Serializable {
     }
 
     /**
-     * Obtém os consumos de serviços registrados em um apartamento.
+     * Obtém os consumos de serviços da estadia atual de um apartamento.
      *
      * @param andar Número do andar (0 a 19)
      * @param numero Número do apartamento no andar (0 a 13)
-     * @return ArrayList com os consumos do apartamento (vazia se não houver nenhum)
+     * @return ArrayList com os consumos da estadia atual do apartamento (vazia se não houver nenhum)
      * @throws IllegalArgumentException se o andar ou o número forem inválidos
      *
      * @pre O andar e o número devem ser válidos
-     * @post Nenhuma alteração de estado; retorna uma nova lista apenas com os consumos do apartamento
+     * @post Nenhuma alteração de estado; retorna uma nova lista apenas com os consumos da estadia atual do apartamento
      */
     public ArrayList<Consumo> getConsumosDoApartamento(int andar, int numero) {
         if (!aptoValido(andar, numero)) {
