@@ -81,6 +81,14 @@ public class HotelTest {
         testarCadastrarServicoMantemOrdemDeCadastro();
         testarCadastrarServicoInvalidoLancaExcecao();
 
+        // Ciclo 12 - Hotel registrarConsumo
+        testarRegistrarConsumoApartamentoOcupado();
+        testarRegistrarConsumoApartamentoLivreLancaExcecao();
+        testarRegistrarConsumoApartamentoReservadoLancaExcecao();
+        testarRegistrarConsumoCoordenadasInvalidasLancaExcecao();
+        testarRegistrarConsumoIndiceServicoInvalidoLancaExcecao();
+        testarRegistrarConsumoQuantidadeInvalidaLancaExcecao();
+
         System.out.println(passou + "/" + total + " testes passaram");
         
         if (passou < total) {
@@ -1018,6 +1026,113 @@ public class HotelTest {
             passou++;
         } catch (Exception e) {
             System.out.println("FALHOU: testarCadastrarServicoInvalidoLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    // --- CICLO 12 ---
+
+    static void testarRegistrarConsumoApartamentoOcupado() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular));
+
+            boolean registrado = hotel.registrarConsumo(0, 0, 0, 2);
+
+            if (registrado &&
+                hotel.getConsumos().size() == 1 &&
+                hotel.getConsumos().get(0).getApartamento() == hotel.getApartamento(0, 0) &&
+                hotel.getConsumos().get(0).getServico() == hotel.getServicos().get(0) &&
+                hotel.getConsumos().get(0).getQuantidade() == 2) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarRegistrarConsumoApartamentoOcupado - Consumo não foi registrado corretamente");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarRegistrarConsumoApartamentoOcupado - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarRegistrarConsumoApartamentoLivreLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            hotel.cadastrarServico("Jantar", 80.0f);
+
+            hotel.registrarConsumo(0, 0, 0, 1);
+            System.out.println("FALHOU: testarRegistrarConsumoApartamentoLivreLancaExcecao - Permitiu registrar consumo em apartamento livre");
+        } catch (IllegalStateException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarRegistrarConsumoApartamentoLivreLancaExcecao - Lançou exceção diferente de IllegalStateException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarRegistrarConsumoApartamentoReservadoLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.reservarApartamento(0, 0, new Reserva(1, titular));
+
+            hotel.registrarConsumo(0, 0, 0, 1);
+            System.out.println("FALHOU: testarRegistrarConsumoApartamentoReservadoLancaExcecao - Permitiu registrar consumo em apartamento reservado");
+        } catch (IllegalStateException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarRegistrarConsumoApartamentoReservadoLancaExcecao - Lançou exceção diferente de IllegalStateException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarRegistrarConsumoCoordenadasInvalidasLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            hotel.cadastrarServico("Jantar", 80.0f);
+
+            hotel.registrarConsumo(20, 0, 0, 1);
+            System.out.println("FALHOU: testarRegistrarConsumoCoordenadasInvalidasLancaExcecao - Permitiu registrar consumo com andar inválido");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarRegistrarConsumoCoordenadasInvalidasLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarRegistrarConsumoIndiceServicoInvalidoLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular));
+
+            hotel.registrarConsumo(0, 0, 1, 1);
+            System.out.println("FALHOU: testarRegistrarConsumoIndiceServicoInvalidoLancaExcecao - Permitiu registrar consumo com índice de serviço inexistente");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarRegistrarConsumoIndiceServicoInvalidoLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarRegistrarConsumoQuantidadeInvalidaLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular));
+
+            hotel.registrarConsumo(0, 0, 0, 0);
+            System.out.println("FALHOU: testarRegistrarConsumoQuantidadeInvalidaLancaExcecao - Permitiu registrar consumo com quantidade zero");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarRegistrarConsumoQuantidadeInvalidaLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
         }
     }
 }
