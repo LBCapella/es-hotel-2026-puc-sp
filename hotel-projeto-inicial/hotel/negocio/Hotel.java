@@ -188,7 +188,7 @@ public class Hotel implements Serializable {
     }
 
     public void cadastrarServico(String nome, float preco) {
-        throw new UnsupportedOperationException("Implementar cadastrarServico");
+        servicos.add(new Servico(nome, preco));
     }
 
     public boolean registrarConsumo(int andar, int numero, int indiceServico, int quantidade) {
