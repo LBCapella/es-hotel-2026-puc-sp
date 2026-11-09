@@ -65,6 +65,55 @@ public class HotelTest {
         testarMostrarMapaRefleteReservaECheckin();
         testarMostrarMapaNaoAlteraEstado();
 
+        // Ciclo 9 - Servico
+        testarCriacaoServicoValido();
+        testarServicoNomeNuloLancaExcecao();
+        testarServicoPrecoNegativoLancaExcecao();
+
+        // Ciclo 10 - Consumo
+        testarCriacaoConsumoValido();
+        testarConsumoApartamentoNuloLancaExcecao();
+        testarConsumoServicoNuloLancaExcecao();
+        testarConsumoQuantidadeInvalidaLancaExcecao();
+
+        // Ciclo 11 - Hotel cadastrarServico
+        testarCadastrarServicoAdicionaAoCardapio();
+        testarCadastrarServicoMantemOrdemDeCadastro();
+        testarCadastrarServicoInvalidoLancaExcecao();
+
+        // Ciclo 12 - Hotel registrarConsumo
+        testarRegistrarConsumoApartamentoOcupado();
+        testarRegistrarConsumoApartamentoLivreLancaExcecao();
+        testarRegistrarConsumoApartamentoReservadoLancaExcecao();
+        testarRegistrarConsumoCoordenadasInvalidasLancaExcecao();
+        testarRegistrarConsumoIndiceServicoInvalidoLancaExcecao();
+        testarRegistrarConsumoQuantidadeInvalidaLancaExcecao();
+
+        // Ciclo 13 - Hotel getConsumosDoApartamento
+        testarConsumosDoApartamentoRetornaApenasDoApartamento();
+        testarConsumosDoApartamentoSemConsumosRetornaListaVazia();
+        testarConsumosDoApartamentoCoordenadasInvalidasLancaExcecao();
+
+        // Ciclo 14 - Fatura
+        testarFaturaCalculaTotais();
+        testarFaturaSemConsumos();
+        testarFaturaApartamentoNuloLancaExcecao();
+        testarFaturaDiasNegativosLancaExcecao();
+        testarFaturaConsumosNulosLancaExcecao();
+
+        // Ciclo 15 - Hotel emitirFatura
+        testarEmitirFaturaApartamentoSimplesComConsumos();
+        testarEmitirFaturaApartamentoPremium();
+        testarEmitirFaturaApartamentoLivreLancaExcecao();
+        testarEmitirFaturaApartamentoReservadoLancaExcecao();
+        testarEmitirFaturaCoordenadasInvalidasLancaExcecao();
+        testarEmitirFaturaDiasNegativosLancaExcecao();
+
+        // Ciclo 16 - Consumos por estadia
+        testarCheckoutEncerraConsumosDoApartamento();
+        testarCheckoutMantemHistoricoDeConsumosDoHotel();
+        testarEmitirFaturaNaoIncluiConsumosDeHospedeAnterior();
+
         System.out.println(passou + "/" + total + " testes passaram");
         
         if (passou < total) {
@@ -853,6 +902,593 @@ public class HotelTest {
             }
         } catch (Exception e) {
             System.out.println("FALHOU: testarMostrarMapaNaoAlteraEstado - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    // --- CICLO 9 ---
+
+    static void testarCriacaoServicoValido() {
+        total++;
+        try {
+            Servico s = new Servico("Jantar", 80.0f);
+            if ("Jantar".equals(s.getNome()) && s.getPreco() == 80.0f) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarCriacaoServicoValido - Getters retornaram valores inconsistentes");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCriacaoServicoValido - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarServicoNomeNuloLancaExcecao() {
+        total++;
+        try {
+            new Servico(null, 80.0f);
+            System.out.println("FALHOU: testarServicoNomeNuloLancaExcecao - Permitiu criar Servico com nome nulo");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarServicoNomeNuloLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarServicoPrecoNegativoLancaExcecao() {
+        total++;
+        try {
+            new Servico("Jantar", -1.0f);
+            System.out.println("FALHOU: testarServicoPrecoNegativoLancaExcecao - Permitiu criar Servico com preço negativo");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarServicoPrecoNegativoLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    // --- CICLO 10 ---
+
+    static void testarCriacaoConsumoValido() {
+        total++;
+        try {
+            Apartamento apto = new ApartamentoSimples();
+            Servico servico = new Servico("Jantar", 80.0f);
+            Consumo consumo = new Consumo(apto, servico, 3);
+            if (consumo.getApartamento() == apto &&
+                consumo.getServico() == servico &&
+                consumo.getQuantidade() == 3 &&
+                consumo.getTotal() == 240.0f) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarCriacaoConsumoValido - Getters ou total retornaram valores inconsistentes");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCriacaoConsumoValido - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarConsumoApartamentoNuloLancaExcecao() {
+        total++;
+        try {
+            new Consumo(null, new Servico("Jantar", 80.0f), 1);
+            System.out.println("FALHOU: testarConsumoApartamentoNuloLancaExcecao - Permitiu criar Consumo com apartamento nulo");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarConsumoApartamentoNuloLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarConsumoServicoNuloLancaExcecao() {
+        total++;
+        try {
+            new Consumo(new ApartamentoSimples(), null, 1);
+            System.out.println("FALHOU: testarConsumoServicoNuloLancaExcecao - Permitiu criar Consumo com serviço nulo");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarConsumoServicoNuloLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarConsumoQuantidadeInvalidaLancaExcecao() {
+        total++;
+        try {
+            new Consumo(new ApartamentoSimples(), new Servico("Jantar", 80.0f), 0);
+            System.out.println("FALHOU: testarConsumoQuantidadeInvalidaLancaExcecao - Permitiu criar Consumo com quantidade zero");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarConsumoQuantidadeInvalidaLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    // --- CICLO 11 ---
+
+    static void testarCadastrarServicoAdicionaAoCardapio() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            hotel.cadastrarServico("Jantar", 80.0f);
+
+            if (hotel.getServicos().size() == 1 &&
+                "Jantar".equals(hotel.getServicos().get(0).getNome()) &&
+                hotel.getServicos().get(0).getPreco() == 80.0f) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarCadastrarServicoAdicionaAoCardapio - Serviço não foi adicionado corretamente ao cardápio");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCadastrarServicoAdicionaAoCardapio - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarCadastrarServicoMantemOrdemDeCadastro() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.cadastrarServico("Lavanderia", 40.0f);
+
+            if (hotel.getServicos().size() == 2 &&
+                "Jantar".equals(hotel.getServicos().get(0).getNome()) &&
+                "Lavanderia".equals(hotel.getServicos().get(1).getNome())) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarCadastrarServicoMantemOrdemDeCadastro - Serviços fora da ordem de cadastro");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCadastrarServicoMantemOrdemDeCadastro - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarCadastrarServicoInvalidoLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            hotel.cadastrarServico(null, 80.0f);
+            System.out.println("FALHOU: testarCadastrarServicoInvalidoLancaExcecao - Permitiu cadastrar serviço com nome nulo");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCadastrarServicoInvalidoLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    // --- CICLO 12 ---
+
+    static void testarRegistrarConsumoApartamentoOcupado() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular));
+
+            boolean registrado = hotel.registrarConsumo(0, 0, 0, 2);
+
+            if (registrado &&
+                hotel.getConsumos().size() == 1 &&
+                hotel.getConsumos().get(0).getApartamento() == hotel.getApartamento(0, 0) &&
+                hotel.getConsumos().get(0).getServico() == hotel.getServicos().get(0) &&
+                hotel.getConsumos().get(0).getQuantidade() == 2) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarRegistrarConsumoApartamentoOcupado - Consumo não foi registrado corretamente");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarRegistrarConsumoApartamentoOcupado - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarRegistrarConsumoApartamentoLivreLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            hotel.cadastrarServico("Jantar", 80.0f);
+
+            hotel.registrarConsumo(0, 0, 0, 1);
+            System.out.println("FALHOU: testarRegistrarConsumoApartamentoLivreLancaExcecao - Permitiu registrar consumo em apartamento livre");
+        } catch (IllegalStateException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarRegistrarConsumoApartamentoLivreLancaExcecao - Lançou exceção diferente de IllegalStateException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarRegistrarConsumoApartamentoReservadoLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.reservarApartamento(0, 0, new Reserva(1, titular));
+
+            hotel.registrarConsumo(0, 0, 0, 1);
+            System.out.println("FALHOU: testarRegistrarConsumoApartamentoReservadoLancaExcecao - Permitiu registrar consumo em apartamento reservado");
+        } catch (IllegalStateException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarRegistrarConsumoApartamentoReservadoLancaExcecao - Lançou exceção diferente de IllegalStateException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarRegistrarConsumoCoordenadasInvalidasLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            hotel.cadastrarServico("Jantar", 80.0f);
+
+            hotel.registrarConsumo(20, 0, 0, 1);
+            System.out.println("FALHOU: testarRegistrarConsumoCoordenadasInvalidasLancaExcecao - Permitiu registrar consumo com andar inválido");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarRegistrarConsumoCoordenadasInvalidasLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarRegistrarConsumoIndiceServicoInvalidoLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular));
+
+            hotel.registrarConsumo(0, 0, 1, 1);
+            System.out.println("FALHOU: testarRegistrarConsumoIndiceServicoInvalidoLancaExcecao - Permitiu registrar consumo com índice de serviço inexistente");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarRegistrarConsumoIndiceServicoInvalidoLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarRegistrarConsumoQuantidadeInvalidaLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular));
+
+            hotel.registrarConsumo(0, 0, 0, 0);
+            System.out.println("FALHOU: testarRegistrarConsumoQuantidadeInvalidaLancaExcecao - Permitiu registrar consumo com quantidade zero");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarRegistrarConsumoQuantidadeInvalidaLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    // --- CICLO 13 ---
+
+    static void testarConsumosDoApartamentoRetornaApenasDoApartamento() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular1 = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            Hospede titular2 = new Hospede("98765432100", "Maria Souza", "Rua B, 456", "11888887777", "maria@email.com");
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.cadastrarServico("Lavanderia", 40.0f);
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular1));
+            hotel.realizarCheckin(0, 1, new Reserva(2, titular2));
+            hotel.registrarConsumo(0, 0, 0, 1);
+            hotel.registrarConsumo(0, 1, 1, 3);
+            hotel.registrarConsumo(0, 0, 1, 2);
+
+            List<Consumo> consumos00 = hotel.getConsumosDoApartamento(0, 0);
+            List<Consumo> consumos01 = hotel.getConsumosDoApartamento(0, 1);
+
+            if (consumos00.size() == 2 &&
+                consumos01.size() == 1 &&
+                consumos00.get(0).getApartamento() == hotel.getApartamento(0, 0) &&
+                consumos00.get(1).getApartamento() == hotel.getApartamento(0, 0) &&
+                consumos01.get(0).getApartamento() == hotel.getApartamento(0, 1) &&
+                consumos01.get(0).getQuantidade() == 3) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarConsumosDoApartamentoRetornaApenasDoApartamento - Consumos não foram filtrados corretamente por apartamento");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarConsumosDoApartamentoRetornaApenasDoApartamento - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarConsumosDoApartamentoSemConsumosRetornaListaVazia() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular));
+            hotel.realizarCheckin(0, 1, new Reserva(2, titular));
+            hotel.registrarConsumo(0, 1, 0, 1);
+
+            if (hotel.getConsumosDoApartamento(0, 0).isEmpty()) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarConsumosDoApartamentoSemConsumosRetornaListaVazia - Retornou consumos de outro apartamento");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarConsumosDoApartamentoSemConsumosRetornaListaVazia - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarConsumosDoApartamentoCoordenadasInvalidasLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            hotel.getConsumosDoApartamento(0, 14);
+            System.out.println("FALHOU: testarConsumosDoApartamentoCoordenadasInvalidasLancaExcecao - Permitiu consultar consumos com número de apartamento inválido");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarConsumosDoApartamentoCoordenadasInvalidasLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    // --- CICLO 14 ---
+
+    static void testarFaturaCalculaTotais() {
+        total++;
+        try {
+            Apartamento apto = new ApartamentoPremium();
+            List<Consumo> consumos = new java.util.ArrayList<>();
+            consumos.add(new Consumo(apto, new Servico("Jantar", 80.0f), 2));
+            consumos.add(new Consumo(apto, new Servico("Lavanderia", 40.0f), 1));
+
+            Fatura fatura = new Fatura(apto, 3, consumos);
+
+            if (fatura.getApartamento() == apto &&
+                fatura.getDias() == 3 &&
+                fatura.getConsumos().size() == 2 &&
+                fatura.getTotalDiarias() == 1050.0f &&
+                fatura.getTotalConsumos() == 200.0f &&
+                fatura.getTotalGeral() == 1250.0f) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarFaturaCalculaTotais - Totais incorretos: diárias " + fatura.getTotalDiarias()
+                        + " (esperado 1050.0), consumos " + fatura.getTotalConsumos()
+                        + " (esperado 200.0), geral " + fatura.getTotalGeral() + " (esperado 1250.0)");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarFaturaCalculaTotais - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarFaturaSemConsumos() {
+        total++;
+        try {
+            Fatura fatura = new Fatura(new ApartamentoSimples(), 2, new java.util.ArrayList<>());
+
+            if (fatura.getTotalDiarias() == 300.0f &&
+                fatura.getTotalConsumos() == 0.0f &&
+                fatura.getTotalGeral() == 300.0f) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarFaturaSemConsumos - Total geral " + fatura.getTotalGeral() + " (esperado 300.0)");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarFaturaSemConsumos - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarFaturaApartamentoNuloLancaExcecao() {
+        total++;
+        try {
+            new Fatura(null, 1, new java.util.ArrayList<>());
+            System.out.println("FALHOU: testarFaturaApartamentoNuloLancaExcecao - Permitiu criar Fatura com apartamento nulo");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarFaturaApartamentoNuloLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarFaturaDiasNegativosLancaExcecao() {
+        total++;
+        try {
+            new Fatura(new ApartamentoSimples(), -1, new java.util.ArrayList<>());
+            System.out.println("FALHOU: testarFaturaDiasNegativosLancaExcecao - Permitiu criar Fatura com dias negativos");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarFaturaDiasNegativosLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarFaturaConsumosNulosLancaExcecao() {
+        total++;
+        try {
+            new Fatura(new ApartamentoSimples(), 1, null);
+            System.out.println("FALHOU: testarFaturaConsumosNulosLancaExcecao - Permitiu criar Fatura com lista de consumos nula");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarFaturaConsumosNulosLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    // --- CICLO 15 ---
+
+    static void testarEmitirFaturaApartamentoSimplesComConsumos() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular1 = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            Hospede titular2 = new Hospede("98765432100", "Maria Souza", "Rua B, 456", "11888887777", "maria@email.com");
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular1));
+            hotel.realizarCheckin(0, 1, new Reserva(2, titular2));
+            hotel.registrarConsumo(0, 0, 0, 2);
+            hotel.registrarConsumo(0, 1, 0, 5);
+
+            Fatura fatura = hotel.emitirFatura(0, 0, 2);
+
+            if (fatura.getApartamento() == hotel.getApartamento(0, 0) &&
+                fatura.getDias() == 2 &&
+                fatura.getConsumos().size() == 1 &&
+                fatura.getTotalDiarias() == 300.0f &&
+                fatura.getTotalConsumos() == 160.0f &&
+                fatura.getTotalGeral() == 460.0f) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarEmitirFaturaApartamentoSimplesComConsumos - Fatura incorreta: total geral "
+                        + fatura.getTotalGeral() + " (esperado 460.0), consumos " + fatura.getConsumos().size() + " (esperado 1)");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarEmitirFaturaApartamentoSimplesComConsumos - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarEmitirFaturaApartamentoPremium() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.realizarCheckin(0, Hotel.SIMPLES_POR_ANDAR, new Reserva(1, titular));
+
+            Fatura fatura = hotel.emitirFatura(0, Hotel.SIMPLES_POR_ANDAR, 3);
+
+            if (fatura.getTotalDiarias() == 1050.0f &&
+                fatura.getTotalConsumos() == 0.0f &&
+                fatura.getTotalGeral() == 1050.0f) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarEmitirFaturaApartamentoPremium - Total geral " + fatura.getTotalGeral() + " (esperado 1050.0)");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarEmitirFaturaApartamentoPremium - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarEmitirFaturaApartamentoLivreLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+
+            hotel.emitirFatura(0, 0, 1);
+            System.out.println("FALHOU: testarEmitirFaturaApartamentoLivreLancaExcecao - Permitiu emitir fatura de apartamento livre");
+        } catch (IllegalStateException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarEmitirFaturaApartamentoLivreLancaExcecao - Lançou exceção diferente de IllegalStateException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarEmitirFaturaApartamentoReservadoLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.reservarApartamento(0, 0, new Reserva(1, titular));
+
+            hotel.emitirFatura(0, 0, 1);
+            System.out.println("FALHOU: testarEmitirFaturaApartamentoReservadoLancaExcecao - Permitiu emitir fatura de apartamento reservado");
+        } catch (IllegalStateException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarEmitirFaturaApartamentoReservadoLancaExcecao - Lançou exceção diferente de IllegalStateException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarEmitirFaturaCoordenadasInvalidasLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+
+            hotel.emitirFatura(-1, 0, 1);
+            System.out.println("FALHOU: testarEmitirFaturaCoordenadasInvalidasLancaExcecao - Permitiu emitir fatura com andar inválido");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarEmitirFaturaCoordenadasInvalidasLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarEmitirFaturaDiasNegativosLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular));
+
+            hotel.emitirFatura(0, 0, -1);
+            System.out.println("FALHOU: testarEmitirFaturaDiasNegativosLancaExcecao - Permitiu emitir fatura com dias negativos");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarEmitirFaturaDiasNegativosLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    // --- CICLO 16 ---
+
+    static void testarCheckoutEncerraConsumosDoApartamento() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular));
+            hotel.registrarConsumo(0, 0, 0, 2);
+
+            hotel.realizarCheckout(0, 0);
+
+            if (hotel.getConsumosDoApartamento(0, 0).isEmpty()) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarCheckoutEncerraConsumosDoApartamento - Consumos da estadia encerrada ainda aparecem no apartamento");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCheckoutEncerraConsumosDoApartamento - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarCheckoutMantemHistoricoDeConsumosDoHotel() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular));
+            hotel.registrarConsumo(0, 0, 0, 2);
+
+            hotel.realizarCheckout(0, 0);
+
+            if (hotel.getConsumos().size() == 1) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarCheckoutMantemHistoricoDeConsumosDoHotel - Histórico de consumos do hotel tem " + hotel.getConsumos().size() + " (esperado 1)");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCheckoutMantemHistoricoDeConsumosDoHotel - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarEmitirFaturaNaoIncluiConsumosDeHospedeAnterior() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular1 = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            Hospede titular2 = new Hospede("98765432100", "Maria Souza", "Rua B, 456", "11888887777", "maria@email.com");
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular1));
+            hotel.registrarConsumo(0, 0, 0, 5);
+            hotel.realizarCheckout(0, 0);
+            hotel.realizarCheckin(0, 0, new Reserva(2, titular2));
+
+            Fatura fatura = hotel.emitirFatura(0, 0, 1);
+
+            if (fatura.getConsumos().isEmpty() && fatura.getTotalGeral() == 150.0f) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarEmitirFaturaNaoIncluiConsumosDeHospedeAnterior - Total geral " + fatura.getTotalGeral()
+                        + " (esperado 150.0), consumos " + fatura.getConsumos().size() + " (esperado 0)");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarEmitirFaturaNaoIncluiConsumosDeHospedeAnterior - Lançou exceção inesperada: " + e.getMessage());
         }
     }
 }

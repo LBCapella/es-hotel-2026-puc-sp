@@ -15,6 +15,7 @@ public class Hotel implements Serializable {
     private Apartamento[][] matriz;
     private ArrayList<Servico> servicos;
     private ArrayList<Consumo> consumos;
+    private ArrayList<Consumo> consumosEstadiaAtual;
 
     /**
      * Constrói o Hotel inicializando a matriz de apartamentos (20 andares x 14 apartamentos)
@@ -27,6 +28,7 @@ public class Hotel implements Serializable {
         this.matriz = new Apartamento[NUM_ANDARES][APTOS_POR_ANDAR];
         this.servicos = new ArrayList<>();
         this.consumos = new ArrayList<>();
+        this.consumosEstadiaAtual = new ArrayList<>();
         inicializar();
     }
 
@@ -98,13 +100,15 @@ public class Hotel implements Serializable {
      * @throws IllegalStateException se o apartamento não estiver OCUPADO
      *
      * @pre O andar e número devem ser válidos e o apartamento deve estar OCUPADO
-     * @post O apartamento nas coordenadas dadas terá status LIVRE e sem reserva associada
+     * @post O apartamento nas coordenadas dadas terá status LIVRE e sem reserva associada;
+     *       seus consumos deixam de constar em getConsumosDoApartamento, mas permanecem em getConsumos
      */
     public boolean realizarCheckout(int andar, int numero) {
         if (!aptoValido(andar, numero)) {
             throw new IllegalArgumentException("Andar ou numero invalido");
         }
         matriz[andar][numero].checkout();
+        consumosEstadiaAtual.removeIf(c -> c.getApartamento() == matriz[andar][numero]);
         return true;
     }
 
@@ -187,29 +191,97 @@ public class Hotel implements Serializable {
         return (float) contar(Status.RESERVADO) / (NUM_ANDARES * APTOS_POR_ANDAR);
     }
 
+    /**
+     * Cadastra um serviço no cardápio do hotel.
+     *
+     * @param nome Nome do serviço
+     * @param preco Preço unitário do serviço
+     * @throws IllegalArgumentException se o nome for nulo ou o preço for negativo
+     *
+     * @pre O nome não pode ser nulo e o preço não pode ser negativo
+     * @post O serviço é adicionado ao final da lista de serviços do hotel
+     */
     public void cadastrarServico(String nome, float preco) {
-        throw new UnsupportedOperationException("Implementar cadastrarServico");
+        servicos.add(new Servico(nome, preco));
     }
 
+    /**
+     * Registra o consumo de um serviço do cardápio em um apartamento ocupado.
+     *
+     * @param andar Número do andar (0 a 19)
+     * @param numero Número do apartamento no andar (0 a 13)
+     * @param indiceServico Posição do serviço na lista de serviços cadastrados
+     * @param quantidade Quantidade consumida
+     * @return true se o consumo foi registrado com sucesso
+     * @throws IllegalArgumentException se o andar, o número, o índice do serviço ou a quantidade forem inválidos
+     * @throws IllegalStateException se o apartamento não estiver OCUPADO
+     *
+     * @pre O apartamento deve estar OCUPADO, o serviço deve estar cadastrado e a quantidade deve ser maior que zero
+     * @post Um Consumo é adicionado à lista de consumos do hotel e aos consumos da estadia atual do apartamento
+     */
     public boolean registrarConsumo(int andar, int numero, int indiceServico, int quantidade) {
         if (!aptoValido(andar, numero)) {
             throw new IllegalArgumentException("Andar ou numero invalido");
         }
-        throw new UnsupportedOperationException("Implementar registrarConsumo");
+        if (indiceServico < 0 || indiceServico >= servicos.size()) {
+            throw new IllegalArgumentException("Indice de servico invalido");
+        }
+        Apartamento apto = matriz[andar][numero];
+        if (!apto.estaOcupado()) {
+            throw new IllegalStateException("Apartamento nao esta ocupado");
+        }
+        Consumo consumo = new Consumo(apto, servicos.get(indiceServico), quantidade);
+        consumos.add(consumo);
+        consumosEstadiaAtual.add(consumo);
+        return true;
     }
 
+    /**
+     * Obtém os consumos de serviços da estadia atual de um apartamento.
+     *
+     * @param andar Número do andar (0 a 19)
+     * @param numero Número do apartamento no andar (0 a 13)
+     * @return ArrayList com os consumos da estadia atual do apartamento (vazia se não houver nenhum)
+     * @throws IllegalArgumentException se o andar ou o número forem inválidos
+     *
+     * @pre O andar e o número devem ser válidos
+     * @post Nenhuma alteração de estado; retorna uma nova lista apenas com os consumos da estadia atual do apartamento
+     */
     public ArrayList<Consumo> getConsumosDoApartamento(int andar, int numero) {
         if (!aptoValido(andar, numero)) {
             throw new IllegalArgumentException("Andar ou numero invalido");
         }
-        throw new UnsupportedOperationException("Implementar getConsumosDoApartamento");
+        ArrayList<Consumo> resultado = new ArrayList<>();
+        for (Consumo c : consumosEstadiaAtual) {
+            if (c.getApartamento() == matriz[andar][numero]) {
+                resultado.add(c);
+            }
+        }
+        return resultado;
     }
 
+    /**
+     * Emite a fatura de um apartamento ocupado, somando as diárias e os consumos de serviços.
+     *
+     * @param andar Número do andar (0 a 19)
+     * @param numero Número do apartamento no andar (0 a 13)
+     * @param dias Quantidade de diárias a faturar
+     * @return Fatura com o total das diárias e dos consumos do apartamento
+     * @throws IllegalArgumentException se o andar, o número ou a quantidade de dias forem inválidos
+     * @throws IllegalStateException se o apartamento não estiver OCUPADO
+     *
+     * @pre O apartamento deve estar OCUPADO e os dias não podem ser negativos
+     * @post Nenhuma alteração de estado; retorna a Fatura calculada
+     */
     public Fatura emitirFatura(int andar, int numero, int dias) {
         if (!aptoValido(andar, numero)) {
             throw new IllegalArgumentException("Andar ou numero invalido");
         }
-        throw new UnsupportedOperationException("Implementar emitirFatura");
+        Apartamento apto = matriz[andar][numero];
+        if (!apto.estaOcupado()) {
+            throw new IllegalStateException("Apartamento nao esta ocupado");
+        }
+        return new Fatura(apto, dias, getConsumosDoApartamento(andar, numero));
     }
 
     /**
