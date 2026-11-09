@@ -258,7 +258,11 @@ public class Hotel implements Serializable {
         if (!aptoValido(andar, numero)) {
             throw new IllegalArgumentException("Andar ou numero invalido");
         }
-        throw new UnsupportedOperationException("Implementar emitirFatura");
+        Apartamento apto = matriz[andar][numero];
+        if (!apto.estaOcupado()) {
+            throw new IllegalStateException("Apartamento nao esta ocupado");
+        }
+        return new Fatura(apto, dias, getConsumosDoApartamento(andar, numero));
     }
 
     /**
