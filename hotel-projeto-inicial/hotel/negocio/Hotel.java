@@ -15,6 +15,7 @@ public class Hotel implements Serializable {
     private Apartamento[][] matriz;
     private ArrayList<Servico> servicos;
     private ArrayList<Consumo> consumos;
+    private ArrayList<Consumo> consumosEstadiaAtual;
 
     /**
      * Constrói o Hotel inicializando a matriz de apartamentos (20 andares x 14 apartamentos)
@@ -27,6 +28,7 @@ public class Hotel implements Serializable {
         this.matriz = new Apartamento[NUM_ANDARES][APTOS_POR_ANDAR];
         this.servicos = new ArrayList<>();
         this.consumos = new ArrayList<>();
+        this.consumosEstadiaAtual = new ArrayList<>();
         inicializar();
     }
 
@@ -105,6 +107,7 @@ public class Hotel implements Serializable {
             throw new IllegalArgumentException("Andar ou numero invalido");
         }
         matriz[andar][numero].checkout();
+        consumosEstadiaAtual.removeIf(c -> c.getApartamento() == matriz[andar][numero]);
         return true;
     }
 
@@ -226,7 +229,9 @@ public class Hotel implements Serializable {
         if (!apto.estaOcupado()) {
             throw new IllegalStateException("Apartamento nao esta ocupado");
         }
-        consumos.add(new Consumo(apto, servicos.get(indiceServico), quantidade));
+        Consumo consumo = new Consumo(apto, servicos.get(indiceServico), quantidade);
+        consumos.add(consumo);
+        consumosEstadiaAtual.add(consumo);
         return true;
     }
 
@@ -246,7 +251,7 @@ public class Hotel implements Serializable {
             throw new IllegalArgumentException("Andar ou numero invalido");
         }
         ArrayList<Consumo> resultado = new ArrayList<>();
-        for (Consumo c : consumos) {
+        for (Consumo c : consumosEstadiaAtual) {
             if (c.getApartamento() == matriz[andar][numero]) {
                 resultado.add(c);
             }
