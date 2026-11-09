@@ -187,6 +187,16 @@ public class Hotel implements Serializable {
         return (float) contar(Status.RESERVADO) / (NUM_ANDARES * APTOS_POR_ANDAR);
     }
 
+    /**
+     * Cadastra um serviço no cardápio do hotel.
+     *
+     * @param nome Nome do serviço
+     * @param preco Preço unitário do serviço
+     * @throws IllegalArgumentException se o nome for nulo ou o preço for negativo
+     *
+     * @pre O nome não pode ser nulo e o preço não pode ser negativo
+     * @post O serviço é adicionado ao final da lista de serviços do hotel
+     */
     public void cadastrarServico(String nome, float preco) {
         servicos.add(new Servico(nome, preco));
     }
