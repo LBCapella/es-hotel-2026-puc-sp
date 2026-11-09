@@ -205,7 +205,15 @@ public class Hotel implements Serializable {
         if (!aptoValido(andar, numero)) {
             throw new IllegalArgumentException("Andar ou numero invalido");
         }
-        throw new UnsupportedOperationException("Implementar registrarConsumo");
+        if (indiceServico < 0 || indiceServico >= servicos.size()) {
+            throw new IllegalArgumentException("Indice de servico invalido");
+        }
+        Apartamento apto = matriz[andar][numero];
+        if (!apto.estaOcupado()) {
+            throw new IllegalStateException("Apartamento nao esta ocupado");
+        }
+        consumos.add(new Consumo(apto, servicos.get(indiceServico), quantidade));
+        return true;
     }
 
     public ArrayList<Consumo> getConsumosDoApartamento(int andar, int numero) {
