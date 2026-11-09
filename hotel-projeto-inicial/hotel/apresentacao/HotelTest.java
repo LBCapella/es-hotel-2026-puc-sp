@@ -76,6 +76,11 @@ public class HotelTest {
         testarConsumoServicoNuloLancaExcecao();
         testarConsumoQuantidadeInvalidaLancaExcecao();
 
+        // Ciclo 11 - Hotel cadastrarServico
+        testarCadastrarServicoAdicionaAoCardapio();
+        testarCadastrarServicoMantemOrdemDeCadastro();
+        testarCadastrarServicoInvalidoLancaExcecao();
+
         System.out.println(passou + "/" + total + " testes passaram");
         
         if (passou < total) {
@@ -961,6 +966,58 @@ public class HotelTest {
             passou++;
         } catch (Exception e) {
             System.out.println("FALHOU: testarConsumoQuantidadeInvalidaLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
+    // --- CICLO 11 ---
+
+    static void testarCadastrarServicoAdicionaAoCardapio() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            hotel.cadastrarServico("Jantar", 80.0f);
+
+            if (hotel.getServicos().size() == 1 &&
+                "Jantar".equals(hotel.getServicos().get(0).getNome()) &&
+                hotel.getServicos().get(0).getPreco() == 80.0f) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarCadastrarServicoAdicionaAoCardapio - Serviço não foi adicionado corretamente ao cardápio");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCadastrarServicoAdicionaAoCardapio - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarCadastrarServicoMantemOrdemDeCadastro() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.cadastrarServico("Lavanderia", 40.0f);
+
+            if (hotel.getServicos().size() == 2 &&
+                "Jantar".equals(hotel.getServicos().get(0).getNome()) &&
+                "Lavanderia".equals(hotel.getServicos().get(1).getNome())) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarCadastrarServicoMantemOrdemDeCadastro - Serviços fora da ordem de cadastro");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCadastrarServicoMantemOrdemDeCadastro - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarCadastrarServicoInvalidoLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            hotel.cadastrarServico(null, 80.0f);
+            System.out.println("FALHOU: testarCadastrarServicoInvalidoLancaExcecao - Permitiu cadastrar serviço com nome nulo");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCadastrarServicoInvalidoLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
         }
     }
 }
