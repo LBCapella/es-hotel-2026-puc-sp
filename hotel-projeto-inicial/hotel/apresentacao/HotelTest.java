@@ -1,5 +1,7 @@
 //REFACTOR
 package hotel.apresentacao;
+import hotel.repositorio.HotelRepo;
+import java.io.File;
 
 import hotel.modelo.*;
 import hotel.negocio.Hotel;
@@ -113,6 +115,9 @@ public class HotelTest {
         testarCheckoutEncerraConsumosDoApartamento();
         testarCheckoutMantemHistoricoDeConsumosDoHotel();
         testarEmitirFaturaNaoIncluiConsumosDeHospedeAnterior();
+
+        // Ciclo 17 - Persistência
+        testarSalvarECarregarHotelVazio();
 
         System.out.println(passou + "/" + total + " testes passaram");
         
@@ -1489,6 +1494,36 @@ public class HotelTest {
             }
         } catch (Exception e) {
             System.out.println("FALHOU: testarEmitirFaturaNaoIncluiConsumosDeHospedeAnterior - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    // --- CICLO 17 ---
+
+    static void testarSalvarECarregarHotelVazio() {
+        total++;
+        String caminho = null;
+        try {
+            File temp = File.createTempFile("hotel_test_", ".dat");
+            caminho = temp.getAbsolutePath();
+
+            Hotel original = new Hotel();
+            HotelRepo.salvar(original, caminho);
+            Hotel carregado = HotelRepo.carregar(caminho);
+
+            if (carregado != null &&
+                carregado != original &&
+                carregado.getApartamento(0, 0).estaLivre() &&
+                aproximadamente(carregado.calcularTaxaOcupacao(), 0f)) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarSalvarECarregarHotelVazio - Hotel carregado nulo, igual ao original ou com estado incorreto");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarSalvarECarregarHotelVazio - Lançou exceção inesperada: " + e);
+        } finally {
+            if (caminho != null) {
+                new File(caminho).delete();
+            }
         }
     }
 }

@@ -13,4 +13,12 @@ public class HotelRepo {
     public static Hotel carregar() throws IOException, ClassNotFoundException {
         throw new UnsupportedOperationException("Implementar carregar");
     }
+
+        public static void salvar(Hotel hotel, String caminho) throws IOException {
+        throw new UnsupportedOperationException("Implementar salvar com caminho");
+    }
+
+    public static Hotel carregar(String caminho) throws IOException, ClassNotFoundException {
+        throw new UnsupportedOperationException("Implementar carregar com caminho");
+    }
 }
