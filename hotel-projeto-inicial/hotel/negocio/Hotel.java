@@ -323,6 +323,9 @@ public class Hotel implements Serializable {
     public ArrayList<Consumo> getConsumos() { return consumos; }
 
     public boolean realizarCheckout(int andar, int numero, int dias) {
+        if (dias <= 0) {
+            throw new IllegalArgumentException("Quantidade de dias deve ser maior que zero");
+        }
         realizarCheckout(andar, numero);
         diasOcupados[andar][numero] += dias;
         return true;
