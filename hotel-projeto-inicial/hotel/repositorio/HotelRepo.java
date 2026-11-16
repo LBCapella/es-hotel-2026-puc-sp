@@ -22,8 +22,10 @@ public class HotelRepo {
         }
     }
 
-    public static Hotel carregar(String caminho) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(caminho))) {
+        public static Hotel carregar(String caminho) throws IOException, ClassNotFoundException {
+        if (!new File(caminho).exists()) {
+            throw new FileNotFoundException("Nenhum hotel salvo foi encontrado.");
+        }try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(caminho))) {
             return (Hotel) in.readObject();
         }
     }
