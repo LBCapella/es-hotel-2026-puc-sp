@@ -1647,7 +1647,7 @@ public class HotelTest {
         }
     }
 
-        // --- CICLO 18 ---
+    // --- CICLO 18 ---
 
     static void testarRankingServicosOrdenaPorQuantidadeConsumida() {
         total++;
