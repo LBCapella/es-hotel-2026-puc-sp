@@ -120,6 +120,7 @@ public class HotelTest {
         testarSalvarECarregarHotelVazio();
         testarSalvarECarregarReservaEOcupacao();
         testarSalvarSemHotelLancaExcecao();
+        testarCarregarSemArquivoSalvoLancaExcecao();
 
         System.out.println(passou + "/" + total + " testes passaram");
         
@@ -1581,6 +1582,24 @@ public class HotelTest {
             if (caminho != null) {
                 new File(caminho).delete();
             }
+        }
+    }
+
+    static void testarCarregarSemArquivoSalvoLancaExcecao() {
+        total++;
+        try {
+            String caminho = new File(System.getProperty("java.io.tmpdir"), "hotel_inexistente_xyz.dat").getAbsolutePath();
+
+            HotelRepo.carregar(caminho);
+            System.out.println("FALHOU: testarCarregarSemArquivoSalvoLancaExcecao - Carregou sem existir arquivo salvo");
+        } catch (java.io.IOException e) {
+            if (e.getMessage() != null && e.getMessage().contains("Nenhum hotel salvo")) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarCarregarSemArquivoSalvoLancaExcecao - Exceção sem mensagem informando que não há hotel salvo");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCarregarSemArquivoSalvoLancaExcecao - Lançou exceção diferente de IOException: " + e.getClass().getName());
         }
     }
 }
