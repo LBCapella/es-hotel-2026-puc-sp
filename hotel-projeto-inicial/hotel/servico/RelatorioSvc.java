@@ -12,7 +12,15 @@ public class RelatorioSvc {
     }
 
     public void gerarRelatorioOcupacao() {
-        throw new UnsupportedOperationException("Implementar relatorio de ocupacao");
+        System.out.println("=== HISTÓRICO DE OCUPAÇÃO (dias ocupados por apartamento) ===");
+        for (int a = 0; a < Hotel.NUM_ANDARES; a++) {
+            for (int n = 0; n < Hotel.APTOS_POR_ANDAR; n++) {
+                int dias = hotel.getDiasOcupado(a, n);
+                if (dias > 0) {
+                    System.out.println("Andar " + a + ", Apto " + n + ": " + dias + " dias");
+                }
+            }
+        }
     }
 
     public void gerarRankingServicos() {
