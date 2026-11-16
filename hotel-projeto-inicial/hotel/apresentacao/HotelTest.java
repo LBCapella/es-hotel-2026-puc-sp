@@ -118,6 +118,7 @@ public class HotelTest {
 
         // Ciclo 17 - Persistência
         testarSalvarECarregarHotelVazio();
+        testarSalvarECarregarReservaEOcupacao();
 
         System.out.println(passou + "/" + total + " testes passaram");
         
@@ -1520,6 +1521,41 @@ public class HotelTest {
             }
         } catch (Exception e) {
             System.out.println("FALHOU: testarSalvarECarregarHotelVazio - Lançou exceção inesperada: " + e);
+        } finally {
+            if (caminho != null) {
+                new File(caminho).delete();
+            }
+        }
+    }
+
+    static void testarSalvarECarregarReservaEOcupacao() {
+        total++;
+        String caminho = null;
+        try {
+            File temp = File.createTempFile("hotel_test_", ".dat");
+            caminho = temp.getAbsolutePath();
+
+            Hotel original = new Hotel();
+            Hospede titular1 = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            Hospede titular2 = new Hospede("98765432100", "Maria Souza", "Rua B, 456", "11888887777", "maria@email.com");
+            original.realizarCheckin(0, 0, new Reserva(1, titular1));
+            original.reservarApartamento(1, 1, new Reserva(2, titular2));
+
+            HotelRepo.salvar(original, caminho);
+            Hotel carregado = HotelRepo.carregar(caminho);
+
+            if (carregado.getApartamento(0, 0).estaOcupado() &&
+                carregado.getApartamento(1, 1).estaReservado() &&
+                "12345678900".equals(carregado.getApartamento(0, 0).getReserva().getTitular().getCpf()) &&
+                "98765432100".equals(carregado.getApartamento(1, 1).getReserva().getTitular().getCpf()) &&
+                aproximadamente(carregado.calcularTaxaOcupacao(), 1f / 280) &&
+                aproximadamente(carregado.calcularTaxaReservas(), 1f / 280)) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarSalvarECarregarPreservaReservaEOcupacao - Estado carregado difere do salvo");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarSalvarECarregarPreservaReservaEOcupacao - Lançou exceção inesperada: " + e);
         } finally {
             if (caminho != null) {
                 new File(caminho).delete();
