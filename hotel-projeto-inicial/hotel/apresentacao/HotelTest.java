@@ -128,10 +128,11 @@ public class HotelTest {
         testarCarregarSemArquivoSalvoLancaExcecao();
         testarSalvarECarregar();
 
-        // Ciclo 18 - Relatórios
+        // Ciclo 19 - Relatórios
         testarRankingServicosOrdenaPorQuantidadeConsumida();
-        testarCheckoutComDias();
-        testarCheckoutComDiasInvalidosLancaExcecao();
+        testarCheckoutComDias(); //Hotel
+        testarCheckoutComDiasInvalidosLancaExcecao(); //Hotel
+        testarRelatorioOcupacaoListaDiasPorApartamento();
 
         System.out.println(passou + "/" + total + " testes passaram");
         
@@ -1732,6 +1733,34 @@ public class HotelTest {
             }
         } catch (Exception e) {
             System.out.println("FALHOU: testarCheckoutComDiasInvalidosLancaExcecao - Lançou exceção inesperada: " + e);
+        }
+    }
+
+    static void testarRelatorioOcupacaoListaDiasPorApartamento() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular1 = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            Hospede titular2 = new Hospede("98765432100", "Maria Souza", "Rua B, 456", "11888887777", "maria@email.com");
+
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular1));
+            hotel.realizarCheckout(0, 0, 3);
+            hotel.realizarCheckin(0, 0, new Reserva(2, titular2));
+            hotel.realizarCheckout(0, 0, 2);
+            hotel.realizarCheckin(1, Hotel.SIMPLES_POR_ANDAR, new Reserva(3, titular1));
+            hotel.realizarCheckout(1, Hotel.SIMPLES_POR_ANDAR, 4);
+
+            String saida = capturarSaida(() -> new RelatorioSvc(hotel).gerarRelatorioOcupacao());
+
+            if (saida.contains("Andar 0, Apto 0: 5 dias") &&
+                saida.contains("Andar 1, Apto 8: 4 dias") &&
+                !saida.contains("Apto 1:")) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarRelatorioOcupacaoListaDiasPorApartamento - Relatório não lista os dias ocupados de cada apartamento");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarRelatorioOcupacaoListaDiasPorApartamento - Lançou exceção inesperada: " + e);
         }
     }
 }
