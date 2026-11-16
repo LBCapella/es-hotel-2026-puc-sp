@@ -30,7 +30,7 @@ public class RelatorioSvc {
         }
         List<Map.Entry<Servico, Integer>> ranking = new ArrayList<>(quantidades.entrySet());
         ranking.sort((a, b) -> b.getValue() - a.getValue());
-        System.out.println("***RANKING DE SERVIÇOS MAIS CONSUMIDOS***");
+        System.out.println("=== RANKING DE SERVIÇOS MAIS CONSUMIDOS ===");
         int posicao = 1;
         for (Map.Entry<Servico, Integer> e : ranking) {
             System.out.println(posicao++ + ". " + e.getKey().getNome() + " - " + e.getValue() + " unidades");
@@ -38,6 +38,21 @@ public class RelatorioSvc {
     }
 
     public void gerarResumoFinanceiro() {
-        throw new UnsupportedOperationException("Implementar resumo financeiro");
+        float totalDiarias = 0f;
+        for (int a = 0; a < Hotel.NUM_ANDARES; a++) {
+            for (int n = 0; n < Hotel.APTOS_POR_ANDAR; n++) {
+                totalDiarias += hotel.getDiasOcupado(a, n) * hotel.getApartamento(a, n).getPrecoDiaria();
+            }
+        }
+
+        float totalConsumos = 0f;
+        for (Consumo c : hotel.getConsumos()) {
+            totalConsumos += c.getTotal();
+        }
+
+        System.out.println("=== RESUMO FINANCEIRO ===");
+        System.out.println("Total de diárias: R$ " + totalDiarias);
+        System.out.println("Total de consumos: R$ " + totalConsumos);
+        System.out.println("Faturamento total: R$ " + (totalDiarias + totalConsumos));
     }
 }
