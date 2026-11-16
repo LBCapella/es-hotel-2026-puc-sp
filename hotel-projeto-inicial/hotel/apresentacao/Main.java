@@ -97,7 +97,9 @@ public class Main {
                     case 3:
                         andar = lerAndar();
                         numero = lerNumero();
-                        if (hotel.realizarCheckout(andar, numero)) {
+                        System.out.print("Quantidade de dias da estadia: ");
+                        int diasEstadia = Integer.parseInt(scanner.nextLine());
+                        if (hotel.realizarCheckout(andar, numero, diasEstadia)) {
                             System.out.println("Check-out realizado com sucesso.");
                         } else {
                             System.out.println("Não foi possível realizar check-out.");
