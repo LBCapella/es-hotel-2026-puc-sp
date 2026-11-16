@@ -119,6 +119,7 @@ public class HotelTest {
         // Ciclo 17 - Persistência
         testarSalvarECarregarHotelVazio();
         testarSalvarECarregarReservaEOcupacao();
+        testarSalvarSemHotelLancaExcecao();
 
         System.out.println(passou + "/" + total + " testes passaram");
         
@@ -1556,6 +1557,26 @@ public class HotelTest {
             }
         } catch (Exception e) {
             System.out.println("FALHOU: testarSalvarECarregarPreservaReservaEOcupacao - Lançou exceção inesperada: " + e);
+        } finally {
+            if (caminho != null) {
+                new File(caminho).delete();
+            }
+        }
+    }
+
+    static void testarSalvarSemHotelLancaExcecao() {
+        total++;
+        String caminho = null;
+        try {
+            File temp = File.createTempFile("hotel_test_", ".dat");
+            caminho = temp.getAbsolutePath();
+
+            HotelRepo.salvar(null, caminho);
+            System.out.println("FALHOU: testarSalvarSemHotelLancaExcecao - Permitiu salvar sem um hotel para gravar");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarSalvarSemHotelLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
         } finally {
             if (caminho != null) {
                 new File(caminho).delete();
