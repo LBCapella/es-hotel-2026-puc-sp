@@ -16,6 +16,7 @@ public class Hotel implements Serializable {
     private ArrayList<Servico> servicos;
     private ArrayList<Consumo> consumos;
     private ArrayList<Consumo> consumosEstadiaAtual;
+    private int[][] diasOcupados;
 
     /**
      * Constrói o Hotel inicializando a matriz de apartamentos (20 andares x 14 apartamentos)
@@ -29,6 +30,7 @@ public class Hotel implements Serializable {
         this.servicos = new ArrayList<>();
         this.consumos = new ArrayList<>();
         this.consumosEstadiaAtual = new ArrayList<>();
+        this.diasOcupados = new int[NUM_ANDARES][APTOS_POR_ANDAR];
         inicializar();
     }
 
@@ -321,10 +323,12 @@ public class Hotel implements Serializable {
     public ArrayList<Consumo> getConsumos() { return consumos; }
 
     public boolean realizarCheckout(int andar, int numero, int dias) {
-        throw new UnsupportedOperationException("Implementar checkout com dias");
+        realizarCheckout(andar, numero);
+        diasOcupados[andar][numero] += dias;
+        return true;
     }
 
     public int getDiasOcupado(int andar, int numero) {
-        throw new UnsupportedOperationException("Implementar getDiasOcupado");
+        return diasOcupados[andar][numero];
     }
 }
