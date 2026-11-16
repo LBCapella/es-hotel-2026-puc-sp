@@ -319,4 +319,12 @@ public class Hotel implements Serializable {
      * @post Nenhuma alteração de estado
      */
     public ArrayList<Consumo> getConsumos() { return consumos; }
+
+    public boolean realizarCheckout(int andar, int numero, int dias) {
+        throw new UnsupportedOperationException("Implementar checkout com dias");
+    }
+
+    public int getDiasOcupado(int andar, int numero) {
+        throw new UnsupportedOperationException("Implementar getDiasOcupado");
+    }
 }

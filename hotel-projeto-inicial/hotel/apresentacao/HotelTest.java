@@ -130,6 +130,7 @@ public class HotelTest {
 
         // Ciclo 18 - Relatórios
         testarRankingServicosOrdenaPorQuantidadeConsumida();
+        testarCheckoutComDias();
 
         System.out.println(passou + "/" + total + " testes passaram");
         
@@ -1672,6 +1673,31 @@ public class HotelTest {
             }
         } catch (Exception e) {
             System.out.println("FALHOU: testarRankingServicosOrdenaPorQuantidadeConsumida - Lançou exceção inesperada: " + e);
+        }
+    }
+
+    static void testarCheckoutComDias() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular1 = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            Hospede titular2 = new Hospede("98765432100", "Maria Souza", "Rua B, 456", "11888887777", "maria@email.com");
+
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular1));
+            boolean primeiro = hotel.realizarCheckout(0, 0, 3);
+            hotel.realizarCheckin(0, 0, new Reserva(2, titular2));
+            boolean segundo = hotel.realizarCheckout(0, 0, 2);
+
+            if (primeiro && segundo &&
+                hotel.getApartamento(0, 0).estaLivre() &&
+                hotel.getDiasOcupado(0, 0) == 5 &&
+                hotel.getDiasOcupado(0, 1) == 0) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarCheckoutComDiasAcumulaHistoricoDoApartamento - Dias das estadias não foram acumulados corretamente");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCheckoutComDiasAcumulaHistoricoDoApartamento - Lançou exceção inesperada: " + e);
         }
     }
 }
