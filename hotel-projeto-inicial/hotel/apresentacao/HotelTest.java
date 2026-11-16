@@ -128,11 +128,12 @@ public class HotelTest {
         testarCarregarSemArquivoSalvoLancaExcecao();
         testarSalvarECarregar();
 
-        // Ciclo 19 - Relatórios
+        // Ciclo 18 - Relatórios
         testarRankingServicosOrdenaPorQuantidadeConsumida();
         testarCheckoutComDias(); //Hotel
         testarCheckoutComDiasInvalidosLancaExcecao(); //Hotel
         testarRelatorioOcupacaoListaDiasPorApartamento();
+        testarResumoFinanceiro();
 
         System.out.println(passou + "/" + total + " testes passaram");
         
@@ -1761,6 +1762,34 @@ public class HotelTest {
             }
         } catch (Exception e) {
             System.out.println("FALHOU: testarRelatorioOcupacaoListaDiasPorApartamento - Lançou exceção inesperada: " + e);
+        }
+    }
+
+    static void testarResumoFinanceiro() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular1 = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            Hospede titular2 = new Hospede("98765432100", "Maria Souza", "Rua B, 456", "11888887777", "maria@email.com");
+            hotel.cadastrarServico("Jantar", 80.0f);
+
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular1));
+            hotel.registrarConsumo(0, 0, 0, 2);
+            hotel.realizarCheckout(0, 0, 3);
+            hotel.realizarCheckin(1, Hotel.SIMPLES_POR_ANDAR, new Reserva(2, titular2));
+            hotel.realizarCheckout(1, Hotel.SIMPLES_POR_ANDAR, 4);
+
+            String saida = capturarSaida(() -> new RelatorioSvc(hotel).gerarResumoFinanceiro());
+
+            if (saida.contains("Total de diárias: R$ 1850.0") &&
+                saida.contains("Total de consumos: R$ 160.0") &&
+                saida.contains("Faturamento total: R$ 2010.0")) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarResumoFinanceiroSomaDiariasEConsumos - Resumo não apresenta os totais esperados de diárias, consumos e faturamento");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarResumoFinanceiroSomaDiariasEConsumos - Lançou exceção inesperada: " + e);
         }
     }
 }
