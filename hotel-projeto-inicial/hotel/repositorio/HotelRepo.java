@@ -14,11 +14,15 @@ public class HotelRepo {
         throw new UnsupportedOperationException("Implementar carregar");
     }
 
-        public static void salvar(Hotel hotel, String caminho) throws IOException {
-        throw new UnsupportedOperationException("Implementar salvar com caminho");
+    public static void salvar(Hotel hotel, String caminho) throws IOException {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(caminho))) {
+            out.writeObject(hotel);
+        }
     }
 
     public static Hotel carregar(String caminho) throws IOException, ClassNotFoundException {
-        throw new UnsupportedOperationException("Implementar carregar com caminho");
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(caminho))) {
+            return (Hotel) in.readObject();
+        }
     }
 }
