@@ -2,8 +2,9 @@ package hotel.modelo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.Serializable;
 
-public class Reserva {
+public class Reserva implements Serializable {
     private int idReserva;
     private Hospede titular;
     private List<Hospede> hospedes;
