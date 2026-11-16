@@ -177,6 +177,10 @@ public class Main {
                 System.out.println("Funcionalidade não implementada: " + e.getMessage());
             } catch (IllegalArgumentException e) {
                 System.out.println("Erro: " + e.getMessage());
+            } catch (java.io.IOException e) {
+                System.out.println("Erro de arquivo: " + e.getMessage());
+            } catch (ClassNotFoundException e) {
+                System.out.println("Arquivo incompatível com esta versão do sistema.");
             } catch (Exception e) {
                 System.out.println("Erro inesperado: " + e.getMessage());
             }
