@@ -131,6 +131,7 @@ public class HotelTest {
         // Ciclo 18 - Relatórios
         testarRankingServicosOrdenaPorQuantidadeConsumida();
         testarCheckoutComDias();
+        testarCheckoutComDiasInvalidosLancaExcecao();
 
         System.out.println(passou + "/" + total + " testes passaram");
         
@@ -1698,6 +1699,39 @@ public class HotelTest {
             }
         } catch (Exception e) {
             System.out.println("FALHOU: testarCheckoutComDiasAcumulaHistoricoDoApartamento - Lançou exceção inesperada: " + e);
+        }
+    }
+
+    static void testarCheckoutComDiasInvalidosLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular));
+
+            boolean rejeitouZero = false;
+            boolean rejeitouNegativo = false;
+
+            try {
+                hotel.realizarCheckout(0, 0, 0);
+            } catch (IllegalArgumentException e) {
+                rejeitouZero = true;
+            }
+            try {
+                hotel.realizarCheckout(0, 0, -1);
+            } catch (IllegalArgumentException e) {
+                rejeitouNegativo = true;
+            }
+
+            if (rejeitouZero && rejeitouNegativo &&
+                hotel.getApartamento(0, 0).estaOcupado() &&
+                hotel.getDiasOcupado(0, 0) == 0) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarCheckoutComDiasInvalidosLancaExcecao - Aceitou dias inválidos ou alterou o estado do apartamento");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCheckoutComDiasInvalidosLancaExcecao - Lançou exceção inesperada: " + e);
         }
     }
 }
