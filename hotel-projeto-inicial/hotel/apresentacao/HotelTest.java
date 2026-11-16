@@ -1,7 +1,7 @@
-//REFACTOR
 package hotel.apresentacao;
 import hotel.repositorio.HotelRepo;
 import java.io.File;
+import hotel.servico.RelatorioSvc;
 
 import hotel.modelo.*;
 import hotel.negocio.Hotel;
@@ -127,6 +127,9 @@ public class HotelTest {
         testarSalvarSemHotelLancaExcecao();
         testarCarregarSemArquivoSalvoLancaExcecao();
         testarSalvarECarregar();
+
+        // Ciclo 18 - Relatórios
+        testarRankingServicosOrdenaPorQuantidadeConsumida();
 
         System.out.println(passou + "/" + total + " testes passaram");
         
@@ -1641,6 +1644,34 @@ public class HotelTest {
             } catch (java.io.IOException e) {
                 System.out.println("FALHOU: testarSalvarECarregar - Não foi possível restaurar o hotel.dat original");
             }
+        }
+    }
+
+        // --- CICLO 18 ---
+
+    static void testarRankingServicosOrdenaPorQuantidadeConsumida() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.cadastrarServico("Lavanderia", 40.0f);
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular));
+            hotel.registrarConsumo(0, 0, 0, 1);
+            hotel.registrarConsumo(0, 0, 0, 1);
+            hotel.registrarConsumo(0, 0, 1, 3);
+
+            String saida = capturarSaida(() -> new RelatorioSvc(hotel).gerarRankingServicos());
+            int posJantar = saida.indexOf("Jantar");
+            int posLavanderia = saida.indexOf("Lavanderia");
+
+            if (posJantar >= 0 && posLavanderia >= 0 && posLavanderia < posJantar) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarRankingServicosOrdenaPorQuantidadeConsumida - Ranking não lista o serviço mais consumido primeiro");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarRankingServicosOrdenaPorQuantidadeConsumida - Lançou exceção inesperada: " + e);
         }
     }
 }
