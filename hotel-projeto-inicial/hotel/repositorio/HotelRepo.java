@@ -15,7 +15,9 @@ public class HotelRepo {
     }
 
     public static void salvar(Hotel hotel, String caminho) throws IOException {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(caminho))) {
+        if (hotel == null) {
+            throw new IllegalArgumentException("Não há hotel para salvar.");
+        }try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(caminho))) {
             out.writeObject(hotel);
         }
     }
