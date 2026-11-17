@@ -7,6 +7,7 @@ import java.io.Serializable;
  */
 public class Consumo implements Serializable {
     private final Apartamento apartamento;
+    private final Hospede titular;
     private final Servico servico;
     private final int quantidade;
 
@@ -21,9 +22,12 @@ public class Consumo implements Serializable {
      * @pre O apartamento e o serviço não podem ser nulos e a quantidade deve ser maior que zero
      * @post Objeto Consumo é instanciado e torna-se imutável
      */
-    public Consumo(Apartamento apto, Servico servico, int quantidade) {
+    public Consumo(Apartamento apto, Hospede titular, Servico servico, int quantidade) {
         if (apto == null) {
             throw new IllegalArgumentException("Apartamento do Consumo não pode ser nulo.");
+        }
+        if (titular == null) {
+            throw new IllegalArgumentException("Titular do Consumo não pode ser nulo.");
         }
         if (servico == null) {
             throw new IllegalArgumentException("Serviço do Consumo não pode ser nulo.");
@@ -32,6 +36,7 @@ public class Consumo implements Serializable {
             throw new IllegalArgumentException("Quantidade do Consumo deve ser maior que zero.");
         }
         this.apartamento = apto;
+        this.titular = titular;
         this.servico = servico;
         this.quantidade = quantidade;
     }
@@ -44,6 +49,8 @@ public class Consumo implements Serializable {
      * @post Retorna a referência do apartamento
      */
     public Apartamento getApartamento() { return apartamento; }
+
+    public Hospede getTitular() { return titular; }
 
     /**
      * Obtém o serviço consumido.

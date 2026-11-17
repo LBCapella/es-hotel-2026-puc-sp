@@ -1,7 +1,7 @@
-//REFACTOR
 package hotel.apresentacao;
 import hotel.repositorio.HotelRepo;
 import java.io.File;
+import hotel.servico.RelatorioSvc;
 
 import hotel.modelo.*;
 import hotel.negocio.Hotel;
@@ -26,12 +26,11 @@ public class HotelTest {
         testarHospedeEqualsEHashCodePorCpf();
 
         // Ciclo 2 - Apartamento (Reserva & Cancelamento)
-        testarReservaPodeTerVariosHospedes();
-        testarReservaNaoPermiteHospedeNulo();
+        testarReservaComTitular();
+        testarReservaUmOcupante();
+        testarReservaVariosOcupantes();
         testarReservaNaoPermiteTitularNulo();
         testarApartamentoReservadoComReserva();
-        testarReservaNaoPermiteAlteracaoExternaDaLista();
-
         testarReservarApartamentoLivre();
         testarReservarApartamentoNaoLivreLancaExcecao();
         testarCancelarReservaComSucesso();
@@ -80,6 +79,7 @@ public class HotelTest {
         // Ciclo 10 - Consumo
         testarCriacaoConsumoValido();
         testarConsumoApartamentoNuloLancaExcecao();
+        testarConsumoTitularNuloLancaExcecao();
         testarConsumoServicoNuloLancaExcecao();
         testarConsumoQuantidadeInvalidaLancaExcecao();
 
@@ -128,6 +128,13 @@ public class HotelTest {
         testarCarregarSemArquivoSalvoLancaExcecao();
         testarSalvarECarregar();
 
+        // Ciclo 18 - Relatórios
+        testarRankingServicosOrdenaPorQuantidadeConsumida();
+        testarCheckoutComDias(); //Hotel
+        testarCheckoutComDiasInvalidosLancaExcecao(); //Hotel
+        testarRelatorioOcupacaoListaDiasPorApartamento();
+        testarResumoFinanceiro();
+
         System.out.println(passou + "/" + total + " testes passaram");
         
         if (passou < total) {
@@ -135,15 +142,13 @@ public class HotelTest {
         }
     }
 
+    // --- CICLO 1 ---
+
     static void testarCriacaoHospedeValido() {
         total++;
         try {
             Hospede h = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
-            if ("12345678900".equals(h.getCpf()) &&
-                "João Silva".equals(h.getNome()) &&
-                "Rua A, 123".equals(h.getEndereco()) &&
-                "11999998888".equals(h.getCelular()) &&
-                "joao@email.com".equals(h.getEmail())) {
+            if ("12345678900".equals(h.getCpf()) && "João Silva".equals(h.getNome()) && "Rua A, 123".equals(h.getEndereco()) && "11999998888".equals(h.getCelular()) && "joao@email.com".equals(h.getEmail())) {
                 passou++;
             } else {
                 System.out.println("FALHOU: testarCriacaoHospedeValido - Getters retornaram valores inconsistentes");
@@ -188,47 +193,58 @@ public class HotelTest {
 
     // --- CICLO 2 ---
 
-    static void testarReservaPodeTerVariosHospedes() {
-        total++;
-        try {
-            Hospede h1 = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
-            Hospede h2 = new Hospede("98765432100", "Maria Souza", "Rua B", "11888887777", "maria@email.com");
-            
-            Reserva reserva = new Reserva(1, h1);
-
-            reserva.adicionarHospede(h2);
-
-            if (reserva.getTitular().equals(h1) && reserva.getHospedes().size() == 2 && reserva.getHospedes().contains(h1) && reserva.getHospedes().contains(h2)) {
-                passou++;
-            } else {
-                System.out.println("FALHOU: testarReservaPodeTerVariosHospedes - Reserva não possui os hóspedes esperados");
-            }
-        } catch (Exception e) {
-            System.out.println("FALHOU: testarReservaPodeTerVariosHospedes - Lançou exceção inesperada: " + e.getMessage());
-        }
-    }
-
-    static void testarReservaNaoPermiteHospedeNulo() {
+    static void testarReservaComTitular() {
         total++;
         try {
             Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
-
             Reserva reserva = new Reserva(1, titular);
-            boolean rejeitouNulo = true;
 
-            try {
-                reserva.adicionarHospede(null);
-                rejeitouNulo = false;
-            } catch (Exception e) {
-            }
-
-            if (rejeitouNulo) {
+            if (reserva.getTitular().equals(titular)
+                    && reserva.getQuantidadeOcupantes() == 1) {
                 passou++;
             } else {
-                System.out.println("FALHOU: testarReservaNaoPermiteHospedeNulo - Reserva permitiu adicionar hóspede nulo");
+                System.out.println("FALHOU: testarReservaIniciaComTitularComoUmOcupante - Titular ou quantidade inicial de ocupantes incorreta");
             }
         } catch (Exception e) {
-            System.out.println("FALHOU: testarReservaNaoPermiteHospedeNulo - Lançou exceção inesperada: " + e.getMessage());
+            System.out.println("FALHOU: testarReservaIniciaComTitularComoUmOcupante - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarReservaUmOcupante() {
+        total++;
+        try {
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+            Reserva reserva = new Reserva(1, titular);
+            reserva.adicionarOcupante();
+
+            if (reserva.getQuantidadeOcupantes() == 2) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarReservaAdicionaOcupanteSemDadosDeHospede - Quantidade de ocupantes incorreta");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarReservaAdicionaOcupanteSemDadosDeHospede - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarReservaVariosOcupantes() {
+        total++;
+        try {
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+            Reserva reserva = new Reserva(1, titular);
+            reserva.adicionarOcupante();
+            reserva.adicionarOcupante();
+            reserva.adicionarOcupante();
+            reserva.adicionarOcupante();
+            reserva.adicionarOcupante();
+
+            if (reserva.getQuantidadeOcupantes() == 6) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarReservaPodeAdicionarVariosOcupantes - Quantidade de ocupantes incorreta");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarReservaPodeAdicionarVariosOcupantes - Lançou exceção inesperada: " + e.getMessage());
         }
     }
 
@@ -249,13 +265,8 @@ public class HotelTest {
         total++;
         try {
             Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
-            Hospede hospede = new Hospede("98765432100", "Maria Silva", "Rua B", "11988887777", "maria@email.com");
-
             Reserva reserva = new Reserva(1, titular);
-            reserva.adicionarHospede(hospede);
-
             Apartamento apto = new Apartamento();
-
             apto.reservar(reserva);
 
             if (apto.estaReservado() && apto.getSymbol() == 'R') {
@@ -265,29 +276,6 @@ public class HotelTest {
             }
         } catch (Exception e) {
             System.out.println("FALHOU: testarApartamentoReservadoComReserva - Lançou exceção inesperada: " + e.getMessage());
-        }
-    }
-
-    static void testarReservaNaoPermiteAlteracaoExternaDaLista() {
-        total++;
-        try {
-            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
-            Hospede hospede = new Hospede( "98765432100", "Maria Silva", "Rua B", "11888887777", "maria@email.com");
-
-            Reserva reserva = new Reserva(1, titular);
-            reserva.adicionarHospede(hospede);
-
-            List<Hospede> hospedes = reserva.getHospedes();
-            hospedes.clear();
-
-            if (reserva.getHospedes().size() == 2) {
-                passou++;
-            } else {
-                System.out.println("FALHOU: testarReservaNaoPermiteAlteracaoExternaDaLista - " + "A lista interna da reserva foi alterada externamente");
-            }
-
-        } catch (Exception e) {
-            System.out.println("FALHOU: testarReservaNaoPermiteAlteracaoExternaDaLista - " + "Lançou exceção inesperada: " + e.getMessage());
         }
     }
 
@@ -965,9 +953,11 @@ public class HotelTest {
         total++;
         try {
             Apartamento apto = new ApartamentoSimples();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
             Servico servico = new Servico("Jantar", 80.0f);
-            Consumo consumo = new Consumo(apto, servico, 3);
+            Consumo consumo = new Consumo(apto, titular, servico, 3);
             if (consumo.getApartamento() == apto &&
+                consumo.getTitular() == titular &&
                 consumo.getServico() == servico &&
                 consumo.getQuantidade() == 3 &&
                 consumo.getTotal() == 240.0f) {
@@ -983,7 +973,8 @@ public class HotelTest {
     static void testarConsumoApartamentoNuloLancaExcecao() {
         total++;
         try {
-            new Consumo(null, new Servico("Jantar", 80.0f), 1);
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+            new Consumo(null, titular, new Servico("Jantar", 80.0f), 1);
             System.out.println("FALHOU: testarConsumoApartamentoNuloLancaExcecao - Permitiu criar Consumo com apartamento nulo");
         } catch (IllegalArgumentException e) {
             passou++;
@@ -992,10 +983,29 @@ public class HotelTest {
         }
     }
 
+    static void testarConsumoTitularNuloLancaExcecao() {
+        total++;
+        try {
+            new Consumo(
+                new ApartamentoSimples(),
+                null,
+                new Servico("Jantar", 80.0f),
+                1
+            );
+
+            System.out.println("FALHOU: testarConsumoTitularNuloLancaExcecao - Permitiu criar Consumo com titular nulo");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarConsumoTitularNuloLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
     static void testarConsumoServicoNuloLancaExcecao() {
         total++;
         try {
-            new Consumo(new ApartamentoSimples(), null, 1);
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+            new Consumo(new ApartamentoSimples(), titular, null, 1);
             System.out.println("FALHOU: testarConsumoServicoNuloLancaExcecao - Permitiu criar Consumo com serviço nulo");
         } catch (IllegalArgumentException e) {
             passou++;
@@ -1007,7 +1017,8 @@ public class HotelTest {
     static void testarConsumoQuantidadeInvalidaLancaExcecao() {
         total++;
         try {
-            new Consumo(new ApartamentoSimples(), new Servico("Jantar", 80.0f), 0);
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+            new Consumo(new ApartamentoSimples(), titular, new Servico("Jantar", 80.0f), 0);
             System.out.println("FALHOU: testarConsumoQuantidadeInvalidaLancaExcecao - Permitiu criar Consumo com quantidade zero");
         } catch (IllegalArgumentException e) {
             passou++;
@@ -1248,9 +1259,10 @@ public class HotelTest {
         total++;
         try {
             Apartamento apto = new ApartamentoPremium();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
             List<Consumo> consumos = new java.util.ArrayList<>();
-            consumos.add(new Consumo(apto, new Servico("Jantar", 80.0f), 2));
-            consumos.add(new Consumo(apto, new Servico("Lavanderia", 40.0f), 1));
+            consumos.add(new Consumo(apto, titular, new Servico("Jantar", 80.0f), 2));
+            consumos.add(new Consumo(apto, titular, new Servico("Lavanderia", 40.0f), 1));
 
             Fatura fatura = new Fatura(apto, 3, consumos);
 
@@ -1641,6 +1653,148 @@ public class HotelTest {
             } catch (java.io.IOException e) {
                 System.out.println("FALHOU: testarSalvarECarregar - Não foi possível restaurar o hotel.dat original");
             }
+        }
+    }
+
+    // --- CICLO 18 ---
+
+    static void testarRankingServicosOrdenaPorQuantidadeConsumida() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.cadastrarServico("Lavanderia", 40.0f);
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular));
+            hotel.registrarConsumo(0, 0, 0, 1);
+            hotel.registrarConsumo(0, 0, 0, 1);
+            hotel.registrarConsumo(0, 0, 1, 3);
+
+            String saida = capturarSaida(() -> new RelatorioSvc(hotel).gerarRankingServicos());
+            int posJantar = saida.indexOf("Jantar");
+            int posLavanderia = saida.indexOf("Lavanderia");
+
+            if (posJantar >= 0 && posLavanderia >= 0 && posLavanderia < posJantar) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarRankingServicosOrdenaPorQuantidadeConsumida - Ranking não lista o serviço mais consumido primeiro");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarRankingServicosOrdenaPorQuantidadeConsumida - Lançou exceção inesperada: " + e);
+        }
+    }
+
+    static void testarCheckoutComDias() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular1 = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            Hospede titular2 = new Hospede("98765432100", "Maria Souza", "Rua B, 456", "11888887777", "maria@email.com");
+
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular1));
+            boolean primeiro = hotel.realizarCheckout(0, 0, 3);
+            hotel.realizarCheckin(0, 0, new Reserva(2, titular2));
+            boolean segundo = hotel.realizarCheckout(0, 0, 2);
+
+            if (primeiro && segundo &&
+                hotel.getApartamento(0, 0).estaLivre() &&
+                hotel.getDiasOcupado(0, 0) == 5 &&
+                hotel.getDiasOcupado(0, 1) == 0) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarCheckoutComDiasAcumulaHistoricoDoApartamento - Dias das estadias não foram acumulados corretamente");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCheckoutComDiasAcumulaHistoricoDoApartamento - Lançou exceção inesperada: " + e);
+        }
+    }
+
+    static void testarCheckoutComDiasInvalidosLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular));
+
+            boolean rejeitouZero = false;
+            boolean rejeitouNegativo = false;
+
+            try {
+                hotel.realizarCheckout(0, 0, 0);
+            } catch (IllegalArgumentException e) {
+                rejeitouZero = true;
+            }
+            try {
+                hotel.realizarCheckout(0, 0, -1);
+            } catch (IllegalArgumentException e) {
+                rejeitouNegativo = true;
+            }
+
+            if (rejeitouZero && rejeitouNegativo &&
+                hotel.getApartamento(0, 0).estaOcupado() &&
+                hotel.getDiasOcupado(0, 0) == 0) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarCheckoutComDiasInvalidosLancaExcecao - Aceitou dias inválidos ou alterou o estado do apartamento");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCheckoutComDiasInvalidosLancaExcecao - Lançou exceção inesperada: " + e);
+        }
+    }
+
+    static void testarRelatorioOcupacaoListaDiasPorApartamento() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular1 = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            Hospede titular2 = new Hospede("98765432100", "Maria Souza", "Rua B, 456", "11888887777", "maria@email.com");
+
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular1));
+            hotel.realizarCheckout(0, 0, 3);
+            hotel.realizarCheckin(0, 0, new Reserva(2, titular2));
+            hotel.realizarCheckout(0, 0, 2);
+            hotel.realizarCheckin(1, Hotel.SIMPLES_POR_ANDAR, new Reserva(3, titular1));
+            hotel.realizarCheckout(1, Hotel.SIMPLES_POR_ANDAR, 4);
+
+            String saida = capturarSaida(() -> new RelatorioSvc(hotel).gerarRelatorioOcupacao());
+
+            if (saida.contains("Andar 0, Apto 0: 5 dias") &&
+                saida.contains("Andar 1, Apto 8: 4 dias") &&
+                !saida.contains("Apto 1:")) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarRelatorioOcupacaoListaDiasPorApartamento - Relatório não lista os dias ocupados de cada apartamento");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarRelatorioOcupacaoListaDiasPorApartamento - Lançou exceção inesperada: " + e);
+        }
+    }
+
+    static void testarResumoFinanceiro() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular1 = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            Hospede titular2 = new Hospede("98765432100", "Maria Souza", "Rua B, 456", "11888887777", "maria@email.com");
+            hotel.cadastrarServico("Jantar", 80.0f);
+
+            hotel.realizarCheckin(0, 0, new Reserva(1, titular1));
+            hotel.registrarConsumo(0, 0, 0, 2);
+            hotel.realizarCheckout(0, 0, 3);
+            hotel.realizarCheckin(1, Hotel.SIMPLES_POR_ANDAR, new Reserva(2, titular2));
+            hotel.realizarCheckout(1, Hotel.SIMPLES_POR_ANDAR, 4);
+
+            String saida = capturarSaida(() -> new RelatorioSvc(hotel).gerarResumoFinanceiro());
+
+            if (saida.contains("Total de diárias: R$ 1850.0") &&
+                saida.contains("Total de consumos: R$ 160.0") &&
+                saida.contains("Faturamento total: R$ 2010.0")) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarResumoFinanceiroSomaDiariasEConsumos - Resumo não apresenta os totais esperados de diárias, consumos e faturamento");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarResumoFinanceiroSomaDiariasEConsumos - Lançou exceção inesperada: " + e);
         }
     }
 }

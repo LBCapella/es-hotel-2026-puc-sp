@@ -1,14 +1,24 @@
 package hotel.modelo;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.Serializable;
 
 public class Reserva implements Serializable {
     private int idReserva;
     private Hospede titular;
-    private List<Hospede> hospedes;
+    private int quantidadeOcupantes;
 
+    /**
+     * Constrói uma reserva com um titular como ocupante inicial.
+     *
+     * @param idReserva Identificador da reserva
+     * @param titular Hóspede titular
+     * @throws IllegalStateException se o titular for nulo
+     *
+     * @pre O titular não pode ser nulo
+     * @post Reserva criada com o titular e quantidade de ocupantes igual a 1
+     */
     public Reserva(int idReserva, Hospede titular) {
         if (titular == null) {
             throw new IllegalStateException();
@@ -16,23 +26,42 @@ public class Reserva implements Serializable {
 
         this.idReserva = idReserva;
         this.titular = titular;
-        this.hospedes = new ArrayList<>();
-
-        hospedes.add(titular);
+        this.quantidadeOcupantes = 1;
     }
 
-    public int getIdReserva() {
-        return idReserva;
-    }
+    /**
+     * Obtém o identificador da reserva.
+     *
+     * @return int com o identificador
+     * @pre Nenhuma
+     * @post Nenhuma alteração de estado
+     */
+    public int getIdReserva() { return idReserva; }
 
+    /**
+     * Obtém o hóspede titular da reserva.
+     *
+     * @return Hospede titular
+     * @pre Nenhuma
+     * @post Nenhuma alteração de estado
+     */
     public Hospede getTitular() { return titular; }
 
-    public void adicionarHospede(Hospede hospede) {
-        if (hospede == null) {
-            throw new IllegalStateException();
-        }
-        hospedes.add(hospede);
-    }
+    /**
+     * Obtém a quantidade total de ocupantes da reserva.
+     * O titular é contabilizado como um ocupante.
+     *
+     * @return quantidade total de ocupantes
+     * @pre Nenhuma
+     * @post Nenhuma alteração de estado
+     */
+    public int getQuantidadeOcupantes() { return quantidadeOcupantes; }
 
-    public List<Hospede> getHospedes() { return new ArrayList<>(hospedes); }
+    /**
+     * Adiciona um ocupante à reserva.
+     *
+     * @pre Nenhuma
+     * @post A quantidade de ocupantes é incrementada em 1
+     */
+    public void adicionarOcupante() { quantidadeOcupantes++; }
 }

@@ -9,8 +9,16 @@ import java.util.Scanner;
 public class Main {
     private static Hotel hotel = new Hotel();
     private static Scanner scanner = new Scanner(System.in);
-    private static int proximoIdReserva = 1;
 
+    /**
+     * Lê do terminal os dados de um hóspede (CPF, nome, endereço, celular e e-mail).
+     *
+     * @return Hospede criado com os dados digitados
+     * @throws IllegalArgumentException se algum dado for nulo (validação feita pelo construtor de Hospede)
+     *
+     * @pre O scanner deve estar aberto e ligado à entrada padrão
+     * @post Um novo Hospede é retornado; o estado do hotel não é alterado
+     */
     private static Hospede lerHospede() {
         System.out.print("CPF: ");
         String cpf = scanner.nextLine();
@@ -25,11 +33,29 @@ public class Main {
         return new Hospede(cpf, nome, endereco, celular, email);
     }
 
+    /**
+     * Lê do terminal o número do andar.
+     *
+     * @return int digitado pelo usuário
+     * @throws NumberFormatException se o texto digitado não for um número inteiro
+     *
+     * @pre O scanner deve estar aberto e ligado à entrada padrão
+     * @post Nenhuma alteração de estado; apenas leitura da entrada
+     */
     private static int lerAndar() {
         System.out.print("Andar (0-" + (Hotel.NUM_ANDARES - 1) + "): ");
         return Integer.parseInt(scanner.nextLine());
     }
 
+    /**
+     * Lê do terminal o número do apartamento dentro do andar.
+     *
+     * @return int digitado pelo usuário
+     * @throws NumberFormatException se o texto digitado não for um número inteiro
+     *
+     * @pre O scanner deve estar aberto e ligado à entrada padrão
+     * @post Nenhuma alteração de estado; apenas leitura da entrada
+     */
     private static int lerNumero() {
         System.out.print("Número (0-" + (Hotel.APTOS_POR_ANDAR - 1) + "): ");
         return Integer.parseInt(scanner.nextLine());
@@ -70,7 +96,7 @@ public class Main {
                         int andar = lerAndar();
                         int numero = lerNumero();
                         Hospede h = lerHospede();
-                        Reserva reserva = new Reserva(proximoIdReserva++, h);
+                        Reserva reserva = new Reserva(hotel.gerarProximoIdReserva(), h);
                         if (hotel.reservarApartamento(andar, numero, reserva)) {
                             System.out.println("Reserva realizada com sucesso.");
                         } else {
@@ -86,7 +112,7 @@ public class Main {
                             System.out.println("Reserva existente encontrada para " + reserva.getTitular() + ".");
                         } else {
                             h = lerHospede();
-                            reserva = new Reserva(proximoIdReserva++, h);
+                            reserva = new Reserva(hotel.gerarProximoIdReserva(), h);
                         }
                         if (hotel.realizarCheckin(andar, numero, reserva)) {
                             System.out.println("Check-in realizado com sucesso.");
@@ -97,7 +123,9 @@ public class Main {
                     case 3:
                         andar = lerAndar();
                         numero = lerNumero();
-                        if (hotel.realizarCheckout(andar, numero)) {
+                        System.out.print("Quantidade de dias da estadia: ");
+                        int diasEstadia = Integer.parseInt(scanner.nextLine());
+                        if (hotel.realizarCheckout(andar, numero, diasEstadia)) {
                             System.out.println("Check-out realizado com sucesso.");
                         } else {
                             System.out.println("Não foi possível realizar check-out.");

@@ -11,6 +11,7 @@ public class Hotel implements Serializable {
     public static final int NUM_ANDARES = 20;
     public static final int APTOS_POR_ANDAR = 14;
     public static final int SIMPLES_POR_ANDAR =8;
+    private int proximoIdReserva;
 
     private Apartamento[][] matriz;
     private ArrayList<Servico> servicos;
@@ -29,9 +30,17 @@ public class Hotel implements Serializable {
         this.servicos = new ArrayList<>();
         this.consumos = new ArrayList<>();
         this.consumosEstadiaAtual = new ArrayList<>();
+        this.proximoIdReserva = 1;
         inicializar();
     }
 
+    /**
+     * Inicializa a matriz de apartamentos do hotel, criando apartamentos simples
+     * e premium conforme a posição de cada apartamento no andar.
+     *
+     * @pre A matriz de apartamentos deve estar inicializada
+     * @post Todos os apartamentos da matriz estarão criados e disponíveis para uso
+     */
     private void inicializar() {
         for (int a = 0; a < NUM_ANDARES; a++) {
             for (int n = 0; n < APTOS_POR_ANDAR; n++) {
@@ -44,6 +53,16 @@ public class Hotel implements Serializable {
         }
     }
 
+    /**
+     * Verifica se as coordenadas informadas correspondem a um apartamento válido do hotel.
+     *
+     * @param andar Número do andar a ser validado
+     * @param numero Número do apartamento no andar a ser validado
+     * @return true se o andar e o número estiverem dentro dos limites válidos; false caso contrário
+     *
+     * @pre Nenhuma
+     * @post Nenhuma alteração de estado
+     */
     private boolean aptoValido(int andar, int numero) {
         return andar >= 0 && andar < NUM_ANDARES && numero >= 0 && numero < APTOS_POR_ANDAR;
     }
@@ -150,6 +169,16 @@ public class Hotel implements Serializable {
         }
     }
 
+    /**
+     * Exibe o status do apartamento e, se não estiver LIVRE, os dados do hóspede.
+     *
+     * @param andar Número do andar (0 a 19)
+     * @param numero Número do apartamento no andar (0 a 13)
+     * @throws IllegalArgumentException se o andar ou o número forem inválidos
+     *
+     * @pre O andar e o número devem ser válidos
+     * @post Nenhuma alteração de estado; apenas exibição
+     */
     public void consultarApartamento(int andar, int numero) {
         if (!aptoValido(andar, numero)) {
             throw new IllegalArgumentException("Andar ou numero invalido");
@@ -157,6 +186,15 @@ public class Hotel implements Serializable {
         throw new UnsupportedOperationException("Implementar consultarApartamento");
     }
 
+    /**
+     * Conta a quantidade de apartamentos que possuem o status informado.
+     *
+     * @param status Status dos apartamentos que devem ser contabilizados
+     * @return Quantidade de apartamentos que possuem o status informado
+     *
+     * @pre O status deve ser um valor válido do enum Status
+     * @post Nenhuma alteração de estado
+     */
     private int contar(Status status) {
         int count = 0;
         for (int a = 0; a < NUM_ANDARES; a++) {
@@ -230,7 +268,7 @@ public class Hotel implements Serializable {
         if (!apto.estaOcupado()) {
             throw new IllegalStateException("Apartamento nao esta ocupado");
         }
-        Consumo consumo = new Consumo(apto, servicos.get(indiceServico), quantidade);
+        Consumo consumo = new Consumo(apto, apto.getReserva().getTitular(), servicos.get(indiceServico), quantidade);
         consumos.add(consumo);
         consumosEstadiaAtual.add(consumo);
         return true;
@@ -319,4 +357,30 @@ public class Hotel implements Serializable {
      * @post Nenhuma alteração de estado
      */
     public ArrayList<Consumo> getConsumos() { return consumos; }
+
+    /**
+     * Realiza o check-out e registra a duração da estadia no histórico de ocupação do apartamento.
+     *
+     * @param andar Número do andar (0 a 19)
+     * @param numero Número do apartamento no andar (0 a 13)
+     * @param dias Quantidade de dias da estadia encerrada (maior que zero)
+     * @return true se o check-out foi realizado com sucesso
+     * @throws IllegalArgumentException se o andar, o número ou a quantidade de dias forem inválidos
+     * @throws IllegalStateException se o apartamento não estiver OCUPADO
+     *
+     * @pre O apartamento deve estar OCUPADO e dias deve ser maior que zero
+     * @post O apartamento fica LIVRE e seus dias ocupados são acrescidos de dias; se houver erro, nada é alterado
+     */
+    public boolean realizarCheckout(int andar, int numero, int dias) {
+        if (dias <= 0) {
+            throw new IllegalArgumentException("Quantidade de dias deve ser maior que zero");
+        }
+        realizarCheckout(andar, numero);
+        matriz[andar][numero].adicionarDiasOcupados(dias);
+        return true;
+    }
+
+    public int getDiasOcupado(int andar, int numero) { return matriz[andar][numero].getDiasOcupados(); }
+
+    public int gerarProximoIdReserva() { return proximoIdReserva++; }
 }
