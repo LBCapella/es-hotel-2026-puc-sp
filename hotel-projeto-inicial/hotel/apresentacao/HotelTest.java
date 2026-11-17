@@ -80,6 +80,7 @@ public class HotelTest {
         // Ciclo 10 - Consumo
         testarCriacaoConsumoValido();
         testarConsumoApartamentoNuloLancaExcecao();
+        testarConsumoTitularNuloLancaExcecao();
         testarConsumoServicoNuloLancaExcecao();
         testarConsumoQuantidadeInvalidaLancaExcecao();
 
@@ -972,9 +973,11 @@ public class HotelTest {
         total++;
         try {
             Apartamento apto = new ApartamentoSimples();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
             Servico servico = new Servico("Jantar", 80.0f);
-            Consumo consumo = new Consumo(apto, servico, 3);
+            Consumo consumo = new Consumo(apto, titular, servico, 3);
             if (consumo.getApartamento() == apto &&
+                consumo.getTitular() == titular &&
                 consumo.getServico() == servico &&
                 consumo.getQuantidade() == 3 &&
                 consumo.getTotal() == 240.0f) {
@@ -990,7 +993,8 @@ public class HotelTest {
     static void testarConsumoApartamentoNuloLancaExcecao() {
         total++;
         try {
-            new Consumo(null, new Servico("Jantar", 80.0f), 1);
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+            new Consumo(null, titular, new Servico("Jantar", 80.0f), 1);
             System.out.println("FALHOU: testarConsumoApartamentoNuloLancaExcecao - Permitiu criar Consumo com apartamento nulo");
         } catch (IllegalArgumentException e) {
             passou++;
@@ -999,10 +1003,29 @@ public class HotelTest {
         }
     }
 
+    static void testarConsumoTitularNuloLancaExcecao() {
+        total++;
+        try {
+            new Consumo(
+                new ApartamentoSimples(),
+                null,
+                new Servico("Jantar", 80.0f),
+                1
+            );
+
+            System.out.println("FALHOU: testarConsumoTitularNuloLancaExcecao - Permitiu criar Consumo com titular nulo");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarConsumoTitularNuloLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        }
+    }
+
     static void testarConsumoServicoNuloLancaExcecao() {
         total++;
         try {
-            new Consumo(new ApartamentoSimples(), null, 1);
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+            new Consumo(new ApartamentoSimples(), titular, null, 1);
             System.out.println("FALHOU: testarConsumoServicoNuloLancaExcecao - Permitiu criar Consumo com serviço nulo");
         } catch (IllegalArgumentException e) {
             passou++;
@@ -1014,7 +1037,8 @@ public class HotelTest {
     static void testarConsumoQuantidadeInvalidaLancaExcecao() {
         total++;
         try {
-            new Consumo(new ApartamentoSimples(), new Servico("Jantar", 80.0f), 0);
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+            new Consumo(new ApartamentoSimples(), titular, new Servico("Jantar", 80.0f), 0);
             System.out.println("FALHOU: testarConsumoQuantidadeInvalidaLancaExcecao - Permitiu criar Consumo com quantidade zero");
         } catch (IllegalArgumentException e) {
             passou++;
@@ -1255,9 +1279,10 @@ public class HotelTest {
         total++;
         try {
             Apartamento apto = new ApartamentoPremium();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
             List<Consumo> consumos = new java.util.ArrayList<>();
-            consumos.add(new Consumo(apto, new Servico("Jantar", 80.0f), 2));
-            consumos.add(new Consumo(apto, new Servico("Lavanderia", 40.0f), 1));
+            consumos.add(new Consumo(apto, titular, new Servico("Jantar", 80.0f), 2));
+            consumos.add(new Consumo(apto, titular, new Servico("Lavanderia", 40.0f), 1));
 
             Fatura fatura = new Fatura(apto, 3, consumos);
 

@@ -268,7 +268,7 @@ public class Hotel implements Serializable {
         if (!apto.estaOcupado()) {
             throw new IllegalStateException("Apartamento nao esta ocupado");
         }
-        Consumo consumo = new Consumo(apto, servicos.get(indiceServico), quantidade);
+        Consumo consumo = new Consumo(apto, apto.getReserva().getTitular(), servicos.get(indiceServico), quantidade);
         consumos.add(consumo);
         consumosEstadiaAtual.add(consumo);
         return true;
