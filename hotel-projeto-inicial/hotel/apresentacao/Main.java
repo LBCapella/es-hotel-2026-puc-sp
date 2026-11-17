@@ -9,7 +9,6 @@ import java.util.Scanner;
 public class Main {
     private static Hotel hotel = new Hotel();
     private static Scanner scanner = new Scanner(System.in);
-    private static int proximoIdReserva = 1;
 
     /**
      * Lê do terminal os dados de um hóspede (CPF, nome, endereço, celular e e-mail).
@@ -97,7 +96,7 @@ public class Main {
                         int andar = lerAndar();
                         int numero = lerNumero();
                         Hospede h = lerHospede();
-                        Reserva reserva = new Reserva(proximoIdReserva++, h);
+                        Reserva reserva = new Reserva(hotel.gerarProximoIdReserva(), h);
                         if (hotel.reservarApartamento(andar, numero, reserva)) {
                             System.out.println("Reserva realizada com sucesso.");
                         } else {
@@ -113,7 +112,7 @@ public class Main {
                             System.out.println("Reserva existente encontrada para " + reserva.getTitular() + ".");
                         } else {
                             h = lerHospede();
-                            reserva = new Reserva(proximoIdReserva++, h);
+                            reserva = new Reserva(hotel.gerarProximoIdReserva(), h);
                         }
                         if (hotel.realizarCheckin(andar, numero, reserva)) {
                             System.out.println("Check-in realizado com sucesso.");

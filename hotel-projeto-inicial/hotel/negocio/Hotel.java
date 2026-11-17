@@ -11,6 +11,7 @@ public class Hotel implements Serializable {
     public static final int NUM_ANDARES = 20;
     public static final int APTOS_POR_ANDAR = 14;
     public static final int SIMPLES_POR_ANDAR =8;
+    private int proximoIdReserva;
 
     private Apartamento[][] matriz;
     private ArrayList<Servico> servicos;
@@ -29,6 +30,7 @@ public class Hotel implements Serializable {
         this.servicos = new ArrayList<>();
         this.consumos = new ArrayList<>();
         this.consumosEstadiaAtual = new ArrayList<>();
+        this.proximoIdReserva = 1;
         inicializar();
     }
 
@@ -378,7 +380,7 @@ public class Hotel implements Serializable {
         return true;
     }
 
-    public int getDiasOcupado(int andar, int numero) {
-        return matriz[andar][numero].getDiasOcupados();
-    }
+    public int getDiasOcupado(int andar, int numero) { return matriz[andar][numero].getDiasOcupados(); }
+
+    public int gerarProximoIdReserva() { return proximoIdReserva++; }
 }
