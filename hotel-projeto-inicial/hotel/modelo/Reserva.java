@@ -1,13 +1,13 @@
 package hotel.modelo;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.Serializable;
 
 public class Reserva implements Serializable {
     private int idReserva;
     private Hospede titular;
-    private List<Hospede> hospedes;
+    private int quantidadeOcupantes;
 
      /**
      * Constrói uma reserva com o titular já incluído na lista de hóspedes.
@@ -26,9 +26,7 @@ public class Reserva implements Serializable {
 
         this.idReserva = idReserva;
         this.titular = titular;
-        this.hospedes = new ArrayList<>();
-
-        hospedes.add(titular);
+        this.quantidadeOcupantes = 1;
     }
 
     /**
@@ -51,36 +49,7 @@ public class Reserva implements Serializable {
      */
     public Hospede getTitular() { return titular; }
 
-    /**
-     * Adiciona um hóspede à reserva.
-     *
-     * @param hospede Hóspede a ser adicionado
-     * @throws IllegalStateException se o hóspede for nulo
-     *
-     * @pre O hóspede não pode ser nulo
-     * @post O hóspede é acrescentado ao final da lista de hóspedes da reserva
-     */
-    public void adicionarHospede(Hospede hospede) {
-        if (hospede == null) {
-            throw new IllegalStateException();
-        }
-        hospedes.add(hospede);
-    }
+    public int getQuantidadeOcupantes() { return quantidadeOcupantes; }
 
-    /**
-     * Obtém uma cópia da lista de hóspedes da reserva.
-     *
-     * @return List com os hóspedes (alterações na cópia não afetam a reserva)
-     * @pre Nenhuma
-     * @post Nenhuma alteração de estado
-     */
-    public List<Hospede> getHospedes() { return new ArrayList<>(hospedes); }
-
-    public int getQuantidadeOcupantes() {
-        return 0;
-    }
-
-    public void adicionarOcupante() {
-        // Implementação temporária para permitir a execução dos testes.
-    }
+    public void adicionarOcupante() { quantidadeOcupantes++; }
 }
