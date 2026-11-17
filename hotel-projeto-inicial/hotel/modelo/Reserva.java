@@ -75,4 +75,12 @@ public class Reserva implements Serializable {
      * @post Nenhuma alteração de estado
      */
     public List<Hospede> getHospedes() { return new ArrayList<>(hospedes); }
+
+    public int getQuantidadeOcupantes() {
+        return 0;
+    }
+
+    public void adicionarOcupante() {
+        // Implementação temporária para permitir a execução dos testes.
+    }
 }

@@ -26,12 +26,11 @@ public class HotelTest {
         testarHospedeEqualsEHashCodePorCpf();
 
         // Ciclo 2 - Apartamento (Reserva & Cancelamento)
-        testarReservaPodeTerVariosHospedes();
-        testarReservaNaoPermiteHospedeNulo();
+        testarReservaComTitular();
+        testarReservaUmOcupante();
+        testarReservaVariosOcupantes();
         testarReservaNaoPermiteTitularNulo();
         testarApartamentoReservadoComReserva();
-        testarReservaNaoPermiteAlteracaoExternaDaLista();
-
         testarReservarApartamentoLivre();
         testarReservarApartamentoNaoLivreLancaExcecao();
         testarCancelarReservaComSucesso();
@@ -143,15 +142,13 @@ public class HotelTest {
         }
     }
 
+    // --- CICLO 1 ---
+
     static void testarCriacaoHospedeValido() {
         total++;
         try {
             Hospede h = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
-            if ("12345678900".equals(h.getCpf()) &&
-                "João Silva".equals(h.getNome()) &&
-                "Rua A, 123".equals(h.getEndereco()) &&
-                "11999998888".equals(h.getCelular()) &&
-                "joao@email.com".equals(h.getEmail())) {
+            if ("12345678900".equals(h.getCpf()) && "João Silva".equals(h.getNome()) && "Rua A, 123".equals(h.getEndereco()) && "11999998888".equals(h.getCelular()) && "joao@email.com".equals(h.getEmail())) {
                 passou++;
             } else {
                 System.out.println("FALHOU: testarCriacaoHospedeValido - Getters retornaram valores inconsistentes");
@@ -196,47 +193,58 @@ public class HotelTest {
 
     // --- CICLO 2 ---
 
-    static void testarReservaPodeTerVariosHospedes() {
-        total++;
-        try {
-            Hospede h1 = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
-            Hospede h2 = new Hospede("98765432100", "Maria Souza", "Rua B", "11888887777", "maria@email.com");
-            
-            Reserva reserva = new Reserva(1, h1);
-
-            reserva.adicionarHospede(h2);
-
-            if (reserva.getTitular().equals(h1) && reserva.getHospedes().size() == 2 && reserva.getHospedes().contains(h1) && reserva.getHospedes().contains(h2)) {
-                passou++;
-            } else {
-                System.out.println("FALHOU: testarReservaPodeTerVariosHospedes - Reserva não possui os hóspedes esperados");
-            }
-        } catch (Exception e) {
-            System.out.println("FALHOU: testarReservaPodeTerVariosHospedes - Lançou exceção inesperada: " + e.getMessage());
-        }
-    }
-
-    static void testarReservaNaoPermiteHospedeNulo() {
+    static void testarReservaComTitular() {
         total++;
         try {
             Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
-
             Reserva reserva = new Reserva(1, titular);
-            boolean rejeitouNulo = true;
 
-            try {
-                reserva.adicionarHospede(null);
-                rejeitouNulo = false;
-            } catch (Exception e) {
-            }
-
-            if (rejeitouNulo) {
+            if (reserva.getTitular().equals(titular)
+                    && reserva.getQuantidadeOcupantes() == 1) {
                 passou++;
             } else {
-                System.out.println("FALHOU: testarReservaNaoPermiteHospedeNulo - Reserva permitiu adicionar hóspede nulo");
+                System.out.println("FALHOU: testarReservaIniciaComTitularComoUmOcupante - Titular ou quantidade inicial de ocupantes incorreta");
             }
         } catch (Exception e) {
-            System.out.println("FALHOU: testarReservaNaoPermiteHospedeNulo - Lançou exceção inesperada: " + e.getMessage());
+            System.out.println("FALHOU: testarReservaIniciaComTitularComoUmOcupante - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarReservaUmOcupante() {
+        total++;
+        try {
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+            Reserva reserva = new Reserva(1, titular);
+            reserva.adicionarOcupante();
+
+            if (reserva.getQuantidadeOcupantes() == 2) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarReservaAdicionaOcupanteSemDadosDeHospede - Quantidade de ocupantes incorreta");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarReservaAdicionaOcupanteSemDadosDeHospede - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    static void testarReservaVariosOcupantes() {
+        total++;
+        try {
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
+            Reserva reserva = new Reserva(1, titular);
+            reserva.adicionarOcupante();
+            reserva.adicionarOcupante();
+            reserva.adicionarOcupante();
+            reserva.adicionarOcupante();
+            reserva.adicionarOcupante();
+
+            if (reserva.getQuantidadeOcupantes() == 6) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarReservaPodeAdicionarVariosOcupantes - Quantidade de ocupantes incorreta");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarReservaPodeAdicionarVariosOcupantes - Lançou exceção inesperada: " + e.getMessage());
         }
     }
 
@@ -257,13 +265,8 @@ public class HotelTest {
         total++;
         try {
             Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
-            Hospede hospede = new Hospede("98765432100", "Maria Silva", "Rua B", "11988887777", "maria@email.com");
-
             Reserva reserva = new Reserva(1, titular);
-            reserva.adicionarHospede(hospede);
-
             Apartamento apto = new Apartamento();
-
             apto.reservar(reserva);
 
             if (apto.estaReservado() && apto.getSymbol() == 'R') {
@@ -273,29 +276,6 @@ public class HotelTest {
             }
         } catch (Exception e) {
             System.out.println("FALHOU: testarApartamentoReservadoComReserva - Lançou exceção inesperada: " + e.getMessage());
-        }
-    }
-
-    static void testarReservaNaoPermiteAlteracaoExternaDaLista() {
-        total++;
-        try {
-            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A", "11999998888", "joao@email.com");
-            Hospede hospede = new Hospede( "98765432100", "Maria Silva", "Rua B", "11888887777", "maria@email.com");
-
-            Reserva reserva = new Reserva(1, titular);
-            reserva.adicionarHospede(hospede);
-
-            List<Hospede> hospedes = reserva.getHospedes();
-            hospedes.clear();
-
-            if (reserva.getHospedes().size() == 2) {
-                passou++;
-            } else {
-                System.out.println("FALHOU: testarReservaNaoPermiteAlteracaoExternaDaLista - " + "A lista interna da reserva foi alterada externamente");
-            }
-
-        } catch (Exception e) {
-            System.out.println("FALHOU: testarReservaNaoPermiteAlteracaoExternaDaLista - " + "Lançou exceção inesperada: " + e.getMessage());
         }
     }
 
