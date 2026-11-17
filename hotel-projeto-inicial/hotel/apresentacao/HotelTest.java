@@ -1,5 +1,7 @@
 //REFACTOR
 package hotel.apresentacao;
+import hotel.repositorio.HotelRepo;
+import java.io.File;
 
 import hotel.modelo.*;
 import hotel.negocio.Hotel;
@@ -7,6 +9,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 public class HotelTest {
     private static int passou = 0;
@@ -113,6 +120,13 @@ public class HotelTest {
         testarCheckoutEncerraConsumosDoApartamento();
         testarCheckoutMantemHistoricoDeConsumosDoHotel();
         testarEmitirFaturaNaoIncluiConsumosDeHospedeAnterior();
+
+        // Ciclo 17 - Persistência
+        testarSalvarECarregarHotelVazio();
+        testarSalvarECarregarReservaEOcupacao();
+        testarSalvarSemHotelLancaExcecao();
+        testarCarregarSemArquivoSalvoLancaExcecao();
+        testarSalvarECarregar();
 
         System.out.println(passou + "/" + total + " testes passaram");
         
@@ -1489,6 +1503,144 @@ public class HotelTest {
             }
         } catch (Exception e) {
             System.out.println("FALHOU: testarEmitirFaturaNaoIncluiConsumosDeHospedeAnterior - Lançou exceção inesperada: " + e.getMessage());
+        }
+    }
+
+    // --- CICLO 17 ---
+
+    static void testarSalvarECarregarHotelVazio() {
+        total++;
+        String caminho = null;
+        try {
+            File temp = File.createTempFile("hotel_test_", ".dat");
+            caminho = temp.getAbsolutePath();
+
+            Hotel original = new Hotel();
+            HotelRepo.salvar(original, caminho);
+            Hotel carregado = HotelRepo.carregar(caminho);
+
+            if (carregado != null &&
+                carregado != original &&
+                carregado.getApartamento(0, 0).estaLivre() &&
+                aproximadamente(carregado.calcularTaxaOcupacao(), 0f)) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarSalvarECarregarHotelVazio - Hotel carregado nulo, igual ao original ou com estado incorreto");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarSalvarECarregarHotelVazio - Lançou exceção inesperada: " + e);
+        } finally {
+            if (caminho != null) {
+                new File(caminho).delete();
+            }
+        }
+    }
+
+    static void testarSalvarECarregarReservaEOcupacao() {
+        total++;
+        String caminho = null;
+        try {
+            File temp = File.createTempFile("hotel_test_", ".dat");
+            caminho = temp.getAbsolutePath();
+
+            Hotel original = new Hotel();
+            Hospede titular1 = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            Hospede titular2 = new Hospede("98765432100", "Maria Souza", "Rua B, 456", "11888887777", "maria@email.com");
+            original.realizarCheckin(0, 0, new Reserva(1, titular1));
+            original.reservarApartamento(1, 1, new Reserva(2, titular2));
+
+            HotelRepo.salvar(original, caminho);
+            Hotel carregado = HotelRepo.carregar(caminho);
+
+            if (carregado.getApartamento(0, 0).estaOcupado() &&
+                carregado.getApartamento(1, 1).estaReservado() &&
+                "12345678900".equals(carregado.getApartamento(0, 0).getReserva().getTitular().getCpf()) &&
+                "98765432100".equals(carregado.getApartamento(1, 1).getReserva().getTitular().getCpf()) &&
+                aproximadamente(carregado.calcularTaxaOcupacao(), 1f / 280) &&
+                aproximadamente(carregado.calcularTaxaReservas(), 1f / 280)) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarSalvarECarregarReservaEOcupacao - Estado carregado difere do salvo");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarSalvarECarregarReservaEOcupacao - Lançou exceção inesperada: " + e);
+        } finally {
+            if (caminho != null) {
+                new File(caminho).delete();
+            }
+        }
+    }
+
+    static void testarSalvarSemHotelLancaExcecao() {
+        total++;
+        String caminho = null;
+        try {
+            File temp = File.createTempFile("hotel_test_", ".dat");
+            caminho = temp.getAbsolutePath();
+
+            HotelRepo.salvar(null, caminho);
+            System.out.println("FALHOU: testarSalvarSemHotelLancaExcecao - Permitiu salvar sem um hotel para gravar");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarSalvarSemHotelLancaExcecao - Lançou exceção diferente de IllegalArgumentException: " + e.getClass().getName());
+        } finally {
+            if (caminho != null) {
+                new File(caminho).delete();
+            }
+        }
+    }
+
+    static void testarCarregarSemArquivoSalvoLancaExcecao() {
+        total++;
+        try {
+            String caminho = new File(System.getProperty("java.io.tmpdir"), "hotel_inexistente_xyz.dat").getAbsolutePath();
+
+            HotelRepo.carregar(caminho);
+            System.out.println("FALHOU: testarCarregarSemArquivoSalvoLancaExcecao - Carregou sem existir arquivo salvo");
+        } catch (java.io.IOException e) {
+            if (e.getMessage() != null && e.getMessage().contains("Nenhum hotel salvo")) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarCarregarSemArquivoSalvoLancaExcecao - Exceção sem mensagem informando que não há hotel salvo");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarCarregarSemArquivoSalvoLancaExcecao - Lançou exceção diferente de IOException: " + e.getClass().getName());
+        }
+    }
+
+    static void testarSalvarECarregar() {
+        total++;
+        Path arquivo = Paths.get("hotel.dat");
+        Path backup = Paths.get("hotel.dat.bak_test");
+        try {
+            if (Files.exists(arquivo)) {
+                Files.move(arquivo, backup, StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            Hotel original = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            original.realizarCheckin(0, 0, new Reserva(1, titular));
+
+            HotelRepo.salvar(original);
+            Hotel carregado = HotelRepo.carregar();
+
+            if (Files.exists(arquivo) && carregado.getApartamento(0, 0).estaOcupado()) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarSalvarECarregar - hotel.dat não foi criado ou o estado carregado está incorreto");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarSalvarECarregar - Lançou exceção inesperada: " + e);
+        } finally {
+            try {
+                Files.deleteIfExists(arquivo);
+                if (Files.exists(backup)) {
+                    Files.move(backup, arquivo, StandardCopyOption.REPLACE_EXISTING);
+                }
+            } catch (java.io.IOException e) {
+                System.out.println("FALHOU: testarSalvarECarregar - Não foi possível restaurar o hotel.dat original");
+            }
         }
     }
 }
