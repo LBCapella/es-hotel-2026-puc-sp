@@ -11,6 +11,15 @@ public class Main {
     private static Scanner scanner = new Scanner(System.in);
     private static int proximoIdReserva = 1;
 
+    /**
+     * Lê do terminal os dados de um hóspede (CPF, nome, endereço, celular e e-mail).
+     *
+     * @return Hospede criado com os dados digitados
+     * @throws IllegalArgumentException se algum dado for nulo (validação feita pelo construtor de Hospede)
+     *
+     * @pre O scanner deve estar aberto e ligado à entrada padrão
+     * @post Um novo Hospede é retornado; o estado do hotel não é alterado
+     */
     private static Hospede lerHospede() {
         System.out.print("CPF: ");
         String cpf = scanner.nextLine();
@@ -25,11 +34,29 @@ public class Main {
         return new Hospede(cpf, nome, endereco, celular, email);
     }
 
+    /**
+     * Lê do terminal o número do andar.
+     *
+     * @return int digitado pelo usuário
+     * @throws NumberFormatException se o texto digitado não for um número inteiro
+     *
+     * @pre O scanner deve estar aberto e ligado à entrada padrão
+     * @post Nenhuma alteração de estado; apenas leitura da entrada
+     */
     private static int lerAndar() {
         System.out.print("Andar (0-" + (Hotel.NUM_ANDARES - 1) + "): ");
         return Integer.parseInt(scanner.nextLine());
     }
 
+    /**
+     * Lê do terminal o número do apartamento dentro do andar.
+     *
+     * @return int digitado pelo usuário
+     * @throws NumberFormatException se o texto digitado não for um número inteiro
+     *
+     * @pre O scanner deve estar aberto e ligado à entrada padrão
+     * @post Nenhuma alteração de estado; apenas leitura da entrada
+     */
     private static int lerNumero() {
         System.out.print("Número (0-" + (Hotel.APTOS_POR_ANDAR - 1) + "): ");
         return Integer.parseInt(scanner.nextLine());

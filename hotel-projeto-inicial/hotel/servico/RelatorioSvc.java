@@ -7,10 +7,25 @@ import java.util.*;
 public class RelatorioSvc {
     private Hotel hotel;
 
+    /**
+     * Constrói o serviço de relatórios sobre um hotel.
+     *
+     * @param hotel Hotel cujos dados serão consultados
+     *
+     * @pre O hotel não deve ser nulo
+     * @post Serviço criado; o hotel não é alterado
+     */
     public RelatorioSvc(Hotel hotel) {
         this.hotel = hotel;
     }
 
+    /**
+     * Imprime o histórico de ocupação: quantos dias cada apartamento ficou ocupado
+     * em estadias já encerradas. Apartamentos sem histórico não aparecem.
+     *
+     * @pre O hotel deve estar inicializado
+     * @post Nenhuma alteração de estado; apenas exibição
+     */
     public void gerarRelatorioOcupacao() {
         System.out.println("=== HISTÓRICO DE OCUPAÇÃO (dias ocupados por apartamento) ===");
         for (int a = 0; a < Hotel.NUM_ANDARES; a++) {
@@ -23,6 +38,12 @@ public class RelatorioSvc {
         }
     }
 
+    /**
+     * Imprime o ranking dos serviços mais consumidos, ordenado pela quantidade total consumida.
+     *
+     * @pre O hotel deve estar inicializado
+     * @post Nenhuma alteração de estado; apenas exibição
+     */
     public void gerarRankingServicos() {
         Map<Servico, Integer> quantidades = new LinkedHashMap<>();
         for (Consumo c : hotel.getConsumos()) {
@@ -37,6 +58,13 @@ public class RelatorioSvc {
         }
     }
 
+    /**
+     * Imprime o resumo financeiro: total de diárias das estadias encerradas, total de consumos
+     * e faturamento total.
+     *
+     * @pre O hotel deve estar inicializado
+     * @post Nenhuma alteração de estado; apenas exibição
+     */
     public void gerarResumoFinanceiro() {
         float totalDiarias = 0f;
         for (int a = 0; a < Hotel.NUM_ANDARES; a++) {
