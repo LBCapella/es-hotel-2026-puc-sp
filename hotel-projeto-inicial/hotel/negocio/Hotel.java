@@ -16,7 +16,6 @@ public class Hotel implements Serializable {
     private ArrayList<Servico> servicos;
     private ArrayList<Consumo> consumos;
     private ArrayList<Consumo> consumosEstadiaAtual;
-    private int[][] diasOcupados;
 
     /**
      * Constrói o Hotel inicializando a matriz de apartamentos (20 andares x 14 apartamentos)
@@ -30,7 +29,6 @@ public class Hotel implements Serializable {
         this.servicos = new ArrayList<>();
         this.consumos = new ArrayList<>();
         this.consumosEstadiaAtual = new ArrayList<>();
-        this.diasOcupados = new int[NUM_ANDARES][APTOS_POR_ANDAR];
         inicializar();
     }
 
@@ -376,21 +374,11 @@ public class Hotel implements Serializable {
             throw new IllegalArgumentException("Quantidade de dias deve ser maior que zero");
         }
         realizarCheckout(andar, numero);
-        diasOcupados[andar][numero] += dias;
+        matriz[andar][numero].adicionarDiasOcupados(dias);
         return true;
     }
 
-    /**
-     * Obtém o total de dias que um apartamento ficou ocupado em estadias já encerradas.
-     *
-     * @param andar Número do andar (0 a 19)
-     * @param numero Número do apartamento no andar (0 a 13)
-     * @return int com o total acumulado de dias ocupados (0 se nunca teve estadia encerrada)
-     *
-     * @pre O andar e o número devem ser válidos
-     * @post Nenhuma alteração de estado
-     */
     public int getDiasOcupado(int andar, int numero) {
-        return diasOcupados[andar][numero];
+        return matriz[andar][numero].getDiasOcupados();
     }
 }

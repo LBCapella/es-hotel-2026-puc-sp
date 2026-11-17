@@ -8,6 +8,7 @@ import java.io.Serializable;
 public class Apartamento implements Serializable {
     private Status status;
     private Reserva reserva;
+    private int diasOcupados;
 
     /**
      * Constrói um Apartamento no estado inicial LIVRE e sem reserva associada.
@@ -18,6 +19,7 @@ public class Apartamento implements Serializable {
     public Apartamento() {
         this.status = Status.LIVRE;
         this.reserva = null;
+        this.diasOcupados = 0;
     }
 
     /**
@@ -115,6 +117,13 @@ public class Apartamento implements Serializable {
         this.reserva = null;
     }
 
+    public void adicionarDiasOcupados(int dias) {
+        if (dias <= 0) {
+            throw new IllegalArgumentException("Quantidade de dias deve ser maior que zero.");
+        }
+        diasOcupados += dias;
+    }
+
     /**
      * Verifica se o apartamento está livre.
      *
@@ -150,6 +159,8 @@ public class Apartamento implements Serializable {
      * @post Retorna o preço base da diária
      */
     public float getPrecoDiaria() { return 0f; }
+
+    public int getDiasOcupados() { return diasOcupados; }
 
     /**
      * Retorna o caractere que representa o status do apartamento no mapa visual.
