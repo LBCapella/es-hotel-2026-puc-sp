@@ -117,6 +117,15 @@ public class Apartamento implements Serializable {
         this.reserva = null;
     }
 
+    /**
+     * Acumula a quantidade de dias de uma estadia encerrada no histórico de ocupação do apartamento.
+     *
+     * @param dias Quantidade de dias da estadia
+     * @throws IllegalArgumentException se a quantidade de dias for menor ou igual a zero
+     *
+     * @pre dias deve ser maior que zero
+     * @post O total de dias ocupados é acrescido de dias
+     */
     public void adicionarDiasOcupados(int dias) {
         if (dias <= 0) {
             throw new IllegalArgumentException("Quantidade de dias deve ser maior que zero.");
@@ -160,6 +169,13 @@ public class Apartamento implements Serializable {
      */
     public float getPrecoDiaria() { return 0f; }
 
+    /**
+     * Obtém o total de dias que o apartamento ficou ocupado em estadias já encerradas.
+     *
+     * @return int com a soma dos dias registrados
+     * @pre Nenhuma
+     * @post Nenhuma alteração de estado
+     */
     public int getDiasOcupados() { return diasOcupados; }
 
     /**

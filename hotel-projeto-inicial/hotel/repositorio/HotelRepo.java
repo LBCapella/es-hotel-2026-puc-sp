@@ -3,6 +3,9 @@ package hotel.repositorio;
 import hotel.negocio.Hotel;
 import java.io.*;
 
+/**
+ * Persistência do estado do hotel em arquivo, por serialização do objeto Hotel.
+ */
 public class HotelRepo {
     private static final String ARQUIVO = "hotel.dat";
 

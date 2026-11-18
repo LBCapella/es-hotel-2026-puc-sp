@@ -6,6 +6,9 @@ import hotel.repositorio.HotelRepo;
 import hotel.servico.RelatorioSvc;
 import java.util.Scanner;
 
+/**
+ * Ponto de entrada do sistema: menu textual operado pela recepção.
+ */
 public class Main {
     private static Hotel hotel = new Hotel();
     private static Scanner scanner = new Scanner(System.in);
@@ -61,6 +64,15 @@ public class Main {
         return Integer.parseInt(scanner.nextLine());
     }
 
+    /**
+     * Exibe o menu em laço, lê a opção escolhida e chama o Hotel, o RelatorioSvc ou o HotelRepo,
+     * capturando as exceções para mostrar mensagens amigáveis.
+     *
+     * @param args Argumentos de linha de comando (não utilizados)
+     *
+     * @pre Nenhuma
+     * @post O programa termina quando a opção 0 é escolhida
+     */
     public static void main(String[] args) {
         int opcao;
         do {

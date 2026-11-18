@@ -15,10 +15,21 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+/**
+ * Testes unitários e de integração do sistema, escritos no ciclo TDD (RED, GREEN, REFACTOR).
+ */
 public class HotelTest {
     private static int passou = 0;
     private static int total = 0;
 
+    /**
+     * Executa todos os testes e imprime quantos passaram.
+     *
+     * @param args Argumentos de linha de comando (não utilizados)
+     *
+     * @pre Nenhuma
+     * @post Encerra com código 1 se algum teste falhar
+     */
     public static void main(String[] args) {
         // Ciclo 1 - Hospede
         testarCriacaoHospedeValido();

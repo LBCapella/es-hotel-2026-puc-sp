@@ -8,9 +8,12 @@ import java.util.ArrayList;
  * Fachada principal do sistema de hotelaria. Gerencia a coleção de apartamentos e coordena as operações.
  */
 public class Hotel implements Serializable {
+    /** Quantidade de andares do hotel. */
     public static final int NUM_ANDARES = 20;
+    /** Quantidade de apartamentos em cada andar. */
     public static final int APTOS_POR_ANDAR = 14;
-    public static final int SIMPLES_POR_ANDAR =8;
+    /** Quantidade de apartamentos simples por andar (as primeiras posições); os demais são premium. */
+    public static final int SIMPLES_POR_ANDAR = 8;
     private int proximoIdReserva;
 
     private Apartamento[][] matriz;
@@ -170,7 +173,9 @@ public class Hotel implements Serializable {
     }
 
     /**
-     * Exibe o status do apartamento e, se não estiver LIVRE, os dados do hóspede.
+     * Exibe o tipo, o status e a diária do apartamento e, se ele não estiver LIVRE,
+     * o número da reserva, a quantidade de ocupantes e os dados do hóspede titular
+     * (nome, CPF, endereço, celular e e-mail).
      *
      * @param andar Número do andar (0 a 19)
      * @param numero Número do apartamento no andar (0 a 13)
@@ -391,7 +396,25 @@ public class Hotel implements Serializable {
         return true;
     }
 
+    /**
+     * Obtém o total de dias que o apartamento ficou ocupado em estadias já encerradas.
+     *
+     * @param andar Número do andar (0 a 19)
+     * @param numero Número do apartamento no andar (0 a 13)
+     * @return int com a soma dos dias registrados nos check-outs do apartamento
+     *
+     * @pre O andar e o número devem ser válidos
+     * @post Nenhuma alteração de estado
+     */
     public int getDiasOcupado(int andar, int numero) { return matriz[andar][numero].getDiasOcupados(); }
 
+    /**
+     * Gera o identificador da próxima reserva do hotel.
+     *
+     * @return int com um identificador ainda não utilizado (começa em 1)
+     *
+     * @pre Nenhuma
+     * @post O contador de reservas é incrementado em 1, de modo que identificadores não se repetem
+     */
     public int gerarProximoIdReserva() { return proximoIdReserva++; }
 }

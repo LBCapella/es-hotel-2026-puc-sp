@@ -4,6 +4,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Reserva de um apartamento: identifica a estadia, o hóspede titular responsável e a
+ * quantidade de ocupantes do quarto.
+ */
 public class Reserva implements Serializable {
     private int idReserva;
     private Hospede titular;
