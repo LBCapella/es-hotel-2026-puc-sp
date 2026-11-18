@@ -92,6 +92,7 @@ public class Main {
             System.out.println("13 - Salvar dados em arquivo");
             System.out.println("14 - Carregar dados de arquivo");
             System.out.println("15 - Resumo financeiro");
+            System.out.println("16 - Listar serviços do cardápio");
             System.out.println("0  - Sair");
             System.out.print("Opção: ");
 
@@ -176,6 +177,10 @@ public class Main {
                     case 9:
                         andar = lerAndar();
                         numero = lerNumero();
+                        hotel.mostrarCardapio();
+                        if (hotel.getServicos().isEmpty()) {
+                            break;
+                        }
                         System.out.print("Índice do serviço (0 a " + (hotel.getServicos().size() - 1) + "): ");
                         int idx = Integer.parseInt(scanner.nextLine());
                         System.out.print("Quantidade: ");
@@ -210,6 +215,9 @@ public class Main {
                         break;
                     case 15:
                         new RelatorioSvc(hotel).gerarResumoFinanceiro();
+                        break;
+                    case 16:
+                        hotel.mostrarCardapio();
                         break;
                     case 0:
                         System.out.println("Encerrando.");
