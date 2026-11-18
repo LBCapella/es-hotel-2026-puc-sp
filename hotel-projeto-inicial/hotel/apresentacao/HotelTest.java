@@ -15,10 +15,21 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+/**
+ * Testes unitários e de integração do sistema, escritos no ciclo TDD (RED, GREEN, REFACTOR).
+ */
 public class HotelTest {
     private static int passou = 0;
     private static int total = 0;
 
+    /**
+     * Executa todos os testes e imprime quantos passaram.
+     *
+     * @param args Argumentos de linha de comando (não utilizados)
+     *
+     * @pre Nenhuma
+     * @post Encerra com código 1 se algum teste falhar
+     */
     public static void main(String[] args) {
         // Ciclo 1 - Hospede
         testarCriacaoHospedeValido();
@@ -134,6 +145,12 @@ public class HotelTest {
         testarCheckoutComDiasInvalidosLancaExcecao(); //Hotel
         testarRelatorioOcupacaoListaDiasPorApartamento();
         testarResumoFinanceiro();
+
+        // Ciclo 19 - Consultar apartamento (REQ09)
+        testarConsultarApartamentoLivreMostraSomenteStatus();
+        testarConsultarApartamentoReservadoMostraDadosDoTitular();
+        testarConsultarApartamentoOcupadoMostraDadosDoTitular();
+        testarConsultarApartamentoCoordenadasInvalidasLancaExcecao();
 
         System.out.println(passou + "/" + total + " testes passaram");
         
@@ -1795,6 +1812,88 @@ public class HotelTest {
             }
         } catch (Exception e) {
             System.out.println("FALHOU: testarResumoFinanceiroSomaDiariasEConsumos - Lançou exceção inesperada: " + e);
+        }
+    }
+
+    // --- CICLO 19 ---
+
+    static void testarConsultarApartamentoLivreMostraSomenteStatus() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+
+            String saida = capturarSaida(() -> hotel.consultarApartamento(0, 0));
+
+            if (saida.contains("LIVRE") && !saida.contains("Titular")) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarConsultarApartamentoLivreMostraSomenteStatus - Saída inesperada: " + saida);
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarConsultarApartamentoLivreMostraSomenteStatus - Lançou exceção inesperada: " + e);
+        }
+    }
+
+    static void testarConsultarApartamentoReservadoMostraDadosDoTitular() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("98765432100", "Maria Souza", "Rua B, 456", "11888887777", "maria@email.com");
+            hotel.reservarApartamento(2, 5, new Reserva(7, titular));
+
+            String saida = capturarSaida(() -> hotel.consultarApartamento(2, 5));
+
+            if (saida.contains("RESERVADO") &&
+                saida.contains("Maria Souza") &&
+                saida.contains("98765432100") &&
+                saida.contains("Reserva nº 7")) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarConsultarApartamentoReservadoMostraDadosDoTitular - Saída inesperada: " + saida);
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarConsultarApartamentoReservadoMostraDadosDoTitular - Lançou exceção inesperada: " + e);
+        }
+    }
+
+    static void testarConsultarApartamentoOcupadoMostraDadosDoTitular() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            Hospede titular = new Hospede("12345678900", "João Silva", "Rua A, 123", "11999998888", "joao@email.com");
+            Reserva reserva = new Reserva(1, titular);
+            reserva.adicionarOcupante();
+            hotel.realizarCheckin(3, 10, reserva);
+
+            String saida = capturarSaida(() -> hotel.consultarApartamento(3, 10));
+
+            if (saida.contains("OCUPADO") &&
+                saida.contains("ApartamentoPremium") &&
+                saida.contains("João Silva") &&
+                saida.contains("12345678900") &&
+                saida.contains("Rua A, 123") &&
+                saida.contains("11999998888") &&
+                saida.contains("joao@email.com") &&
+                saida.contains("Ocupantes: 2")) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarConsultarApartamentoOcupadoMostraDadosDoTitular - Saída inesperada: " + saida);
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarConsultarApartamentoOcupadoMostraDadosDoTitular - Lançou exceção inesperada: " + e);
+        }
+    }
+
+    static void testarConsultarApartamentoCoordenadasInvalidasLancaExcecao() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            hotel.consultarApartamento(Hotel.NUM_ANDARES, 0);
+            System.out.println("FALHOU: testarConsultarApartamentoCoordenadasInvalidasLancaExcecao - Não lançou exceção");
+        } catch (IllegalArgumentException e) {
+            passou++;
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarConsultarApartamentoCoordenadasInvalidasLancaExcecao - Lançou exceção errada: " + e);
         }
     }
 }

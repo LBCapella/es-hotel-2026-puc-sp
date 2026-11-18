@@ -15,11 +15,12 @@ public class Consumo implements Serializable {
      * Constrói um objeto Consumo validando os parâmetros.
      *
      * @param apto Apartamento que consumiu o serviço
+     * @param titular Hóspede titular da reserva no momento do consumo
      * @param servico Serviço consumido
      * @param quantidade Quantidade consumida
-     * @throws IllegalArgumentException se o apartamento ou o serviço forem nulos, ou se a quantidade for menor ou igual a zero
+     * @throws IllegalArgumentException se o apartamento, o titular ou o serviço forem nulos, ou se a quantidade for menor ou igual a zero
      *
-     * @pre O apartamento e o serviço não podem ser nulos e a quantidade deve ser maior que zero
+     * @pre O apartamento, o titular e o serviço não podem ser nulos e a quantidade deve ser maior que zero
      * @post Objeto Consumo é instanciado e torna-se imutável
      */
     public Consumo(Apartamento apto, Hospede titular, Servico servico, int quantidade) {
@@ -50,6 +51,13 @@ public class Consumo implements Serializable {
      */
     public Apartamento getApartamento() { return apartamento; }
 
+    /**
+     * Obtém o hóspede titular da reserva no momento em que o serviço foi consumido.
+     *
+     * @return Hospede titular associado ao consumo
+     * @pre Nenhuma
+     * @post Retorna a referência do titular
+     */
     public Hospede getTitular() { return titular; }
 
     /**

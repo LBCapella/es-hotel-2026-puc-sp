@@ -4,6 +4,9 @@ import hotel.modelo.*;
 import hotel.negocio.Hotel;
 import java.util.*;
 
+/**
+ * Geração dos relatórios gerenciais do hotel: histórico de ocupação, ranking de serviços e resumo financeiro.
+ */
 public class RelatorioSvc {
     private Hotel hotel;
 
