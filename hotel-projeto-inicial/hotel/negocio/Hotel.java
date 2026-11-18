@@ -202,6 +202,18 @@ public class Hotel implements Serializable {
         }
     }
 
+    public void mostrarCardapio() {
+        if (servicos.isEmpty()) {
+            System.out.println("Nenhum serviço cadastrado.");
+            return;
+        }
+        System.out.println("=== CARDÁPIO DE SERVIÇOS ===");
+        for (int i = 0; i < servicos.size(); i++) {
+            Servico servico = servicos.get(i);
+            System.out.println(i + " - " + servico.getNome() + " - R$ " + servico.getPreco());
+        }
+    }
+
     /**
      * Conta a quantidade de apartamentos que possuem o status informado.
      *
