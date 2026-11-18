@@ -183,7 +183,18 @@ public class Hotel implements Serializable {
         if (!aptoValido(andar, numero)) {
             throw new IllegalArgumentException("Andar ou numero invalido");
         }
-        throw new UnsupportedOperationException("Implementar consultarApartamento");
+        Apartamento apto = matriz[andar][numero];
+        System.out.println("Andar " + andar + ", Apto " + numero + ": " + apto);
+        if (!apto.estaLivre()) {
+            Reserva reserva = apto.getReserva();
+            Hospede titular = reserva.getTitular();
+            System.out.println("Reserva nº " + reserva.getIdReserva() + " - Ocupantes: " + reserva.getQuantidadeOcupantes());
+            System.out.println("Titular: " + titular.getNome());
+            System.out.println("CPF: " + titular.getCpf());
+            System.out.println("Endereço: " + titular.getEndereco());
+            System.out.println("Celular: " + titular.getCelular());
+            System.out.println("Email: " + titular.getEmail());
+        }
     }
 
     /**
