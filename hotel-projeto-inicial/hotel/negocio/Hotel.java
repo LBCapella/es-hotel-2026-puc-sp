@@ -203,6 +203,26 @@ public class Hotel implements Serializable {
     }
 
     /**
+     * Imprime no console o cardápio de serviços do hotel, um por linha, no formato
+     * "índice - nome - R$ preço"; o índice é o usado para registrar consumos.
+     * Se nenhum serviço estiver cadastrado, informa que o cardápio está vazio.
+     *
+     * @pre O hotel deve estar inicializado (construtor já o faz)
+     * @post Nenhuma alteração de estado; apenas exibição
+     */
+    public void mostrarCardapio() {
+        if (servicos.isEmpty()) {
+            System.out.println("Nenhum serviço cadastrado.");
+            return;
+        }
+        System.out.println("=== CARDÁPIO DE SERVIÇOS ===");
+        for (int i = 0; i < servicos.size(); i++) {
+            Servico servico = servicos.get(i);
+            System.out.println(i + " - " + servico.getNome() + " - R$ " + servico.getPreco());
+        }
+    }
+
+    /**
      * Conta a quantidade de apartamentos que possuem o status informado.
      *
      * @param status Status dos apartamentos que devem ser contabilizados
