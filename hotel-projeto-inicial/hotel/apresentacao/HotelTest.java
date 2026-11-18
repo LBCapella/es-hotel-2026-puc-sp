@@ -152,6 +152,11 @@ public class HotelTest {
         testarConsultarApartamentoOcupadoMostraDadosDoTitular();
         testarConsultarApartamentoCoordenadasInvalidasLancaExcecao();
 
+        // Ciclo 20 - Mostrar cardápio
+        testarMostrarCardapioListaIndiceNomeEPreco();
+        testarMostrarCardapioVazioAvisaQueNaoHaServicos();
+        testarMostrarCardapioNaoAlteraCardapio();
+
         System.out.println(passou + "/" + total + " testes passaram");
         
         if (passou < total) {
@@ -1894,6 +1899,67 @@ public class HotelTest {
             passou++;
         } catch (Exception e) {
             System.out.println("FALHOU: testarConsultarApartamentoCoordenadasInvalidasLancaExcecao - Lançou exceção errada: " + e);
+        }
+    }
+
+    // --- CICLO 20 ---
+
+    static void testarMostrarCardapioListaIndiceNomeEPreco() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.cadastrarServico("Lavanderia", 45.0f);
+
+            String saida = capturarSaida(() -> hotel.mostrarCardapio());
+
+            if (saida.contains("0 - Jantar - R$ 80.0") &&
+                saida.contains("1 - Lavanderia - R$ 45.0") &&
+                saida.indexOf("Jantar") < saida.indexOf("Lavanderia")) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarMostrarCardapioListaIndiceNomeEPreco - Saída inesperada: " + saida);
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarMostrarCardapioListaIndiceNomeEPreco - Lançou exceção inesperada: " + e);
+        }
+    }
+
+    static void testarMostrarCardapioVazioAvisaQueNaoHaServicos() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+
+            String saida = capturarSaida(() -> hotel.mostrarCardapio());
+
+            if (saida.contains("Nenhum serviço cadastrado")) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarMostrarCardapioVazioAvisaQueNaoHaServicos - Saída inesperada: " + saida);
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarMostrarCardapioVazioAvisaQueNaoHaServicos - Lançou exceção inesperada: " + e);
+        }
+    }
+
+    static void testarMostrarCardapioNaoAlteraCardapio() {
+        total++;
+        try {
+            Hotel hotel = new Hotel();
+            hotel.cadastrarServico("Jantar", 80.0f);
+            hotel.cadastrarServico("Lavanderia", 45.0f);
+
+            capturarSaida(() -> hotel.mostrarCardapio());
+
+            if (hotel.getServicos().size() == 2 &&
+                "Jantar".equals(hotel.getServicos().get(0).getNome()) &&
+                "Lavanderia".equals(hotel.getServicos().get(1).getNome())) {
+                passou++;
+            } else {
+                System.out.println("FALHOU: testarMostrarCardapioNaoAlteraCardapio - Cardápio foi alterado ao ser exibido");
+            }
+        } catch (Exception e) {
+            System.out.println("FALHOU: testarMostrarCardapioNaoAlteraCardapio - Lançou exceção inesperada: " + e);
         }
     }
 }
