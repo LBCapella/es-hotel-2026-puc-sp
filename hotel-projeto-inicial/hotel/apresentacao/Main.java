@@ -91,6 +91,7 @@ public class Main {
             System.out.println("12 - Ranking de serviços");
             System.out.println("13 - Salvar dados em arquivo");
             System.out.println("14 - Carregar dados de arquivo");
+            System.out.println("15 - Resumo financeiro");
             System.out.println("0  - Sair");
             System.out.print("Opção: ");
 
@@ -206,6 +207,9 @@ public class Main {
                     case 14:
                         hotel = HotelRepo.carregar();
                         System.out.println("Dados carregados.");
+                        break;
+                    case 15:
+                        new RelatorioSvc(hotel).gerarResumoFinanceiro();
                         break;
                     case 0:
                         System.out.println("Encerrando.");
